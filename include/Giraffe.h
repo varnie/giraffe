@@ -280,17 +280,14 @@ namespace Giraffe {
                 Entity entity = _deletedEntities.back();
                 _deletedEntities.pop_back();
                 _entities.push_back(entity);
-
-                return entity;
             } else {
                 std::size_t curEntityIndex = _entities.size();
-                Entity entity(curEntityIndex, *this);
-                _entities.push_back(entity);
-                _entitiesComponentsMask.emplace_back(
+                _entities.push_back(Entity(curEntityIndex, *this));
+                _entitiesComponentsMask.push_back(
                         std::vector<std::size_t>(_componentsKindsCount, COMPONENT_DOES_NOT_EXIST));
-
-                return entity;
             }
+
+            return _entities.back();
         }
 
         void removeEntity(const Entity &entity) {
