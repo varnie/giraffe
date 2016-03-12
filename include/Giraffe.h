@@ -453,7 +453,6 @@ namespace Giraffe {
         }
 
     public:
-
         //3 or more parameters
         template<class A1, class A2, class A3, class ...Ax>
         Iterator<PredicateAll> begin() {
@@ -611,6 +610,35 @@ namespace Giraffe {
             return Result<Iterator<PredicateOne>>(
                     Iterator<PredicateOne>(_entities.begin(), _entities.end(), predicate),
                     Iterator<PredicateOne>(_entities.end(), _entities.end(), predicate)
+            );
+        }
+
+        //methods for retrieving *all* entities
+        Entities_Container_t::iterator begin() {
+
+            return _entities.begin();
+        }
+
+        Entities_Container_t::iterator end() {
+
+            return _entities.end();
+        }
+
+        void process(std::function<void(const Entity &entity)> func) {
+
+            for (auto iterBegin = _entities.begin(), iterEnd = _entities.end();
+                 iterBegin != iterEnd;
+                 ++iterBegin) {
+                Giraffe::Entity &entity = *iterBegin;
+                func(entity);
+            }
+        }
+
+        Result<Entities_Container_t::iterator> range() {
+
+            return Result<Entities_Container_t::iterator>(
+                    Entities_Container_t::iterator(_entities.begin()),
+                    Entities_Container_t::iterator(_entities.end())
             );
         }
 
