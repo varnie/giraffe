@@ -180,9 +180,10 @@ namespace Giraffe {
                 return *this;
             }
 
-            FilterIterator &operator++(int) {
+            FilterIterator operator++(int) {
+                FilterIterator obj = *this;
                 advance();
-                return *this;
+                return obj;
             }
 
             bool operator==(const FilterIterator &rhs) const { return _current == rhs._current; }
