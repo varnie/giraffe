@@ -113,7 +113,7 @@ namespace Giraffe {
                 return positionIndex;
             } else {
                 //not found, add new block
-                _memoryBlock.emplace_back(Chunk());
+                _memoryBlock.emplace_back();
 
                 void *block = static_cast<void *> (&_memoryBlock.back());
                 new(block) C(std::forward<Args>(args) ...);
@@ -126,7 +126,7 @@ namespace Giraffe {
             assert(index < _memoryBlock.size());
             C *component = reinterpret_cast<C *>(&_memoryBlock[index]);
             component->~C();
-            _deletedComponentsIndexes.emplace_back(index);
+            _deletedComponentsIndexes.push_back(index);
         }
 
         C *getComponent(std::size_t index) {
@@ -146,7 +146,6 @@ namespace Giraffe {
     private:
         std::vector<Chunk> _memoryBlock;
         std::deque<std::size_t> _deletedComponentsIndexes;
-        std::size_t _totalComponents;
     };
 
     template<class C>
@@ -280,13 +279,13 @@ namespace Giraffe {
             if (!_deletedEntities.empty()) {
                 Entity entity = _deletedEntities.back();
                 _deletedEntities.pop_back();
-                _entities.emplace_back(entity);
+                _entities.push_back(entity);
 
                 return entity;
             } else {
                 std::size_t curEntityIndex = _entities.size();
                 Entity entity(curEntityIndex, *this);
-                _entities.emplace_back(entity);
+                _entities.push_back(entity);
                 _entitiesComponentsMask.emplace_back(
                         std::vector<std::size_t>(_componentsKindsCount, COMPONENT_DOES_NOT_EXIST));
 
@@ -301,7 +300,7 @@ namespace Giraffe {
                 std::swap(_entities[entityIndex], _entities.back());
                 _entities.pop_back();
 
-                _deletedEntities.emplace_back(entity);
+                _deletedEntities.push_back(entity);
 
                 auto &componentsMask = _entitiesComponentsMask[entityIndex];
 
@@ -525,7 +524,7 @@ namespace Giraffe {
                          iterEnd = Iterator<PredicateAll>(_entities.end(), _entities.end(), predicate);
                  iterBegin != iterEnd;
                  ++iterBegin) {
-                Giraffe::Entity &entity = *iterBegin;
+                const Giraffe::Entity &entity = *iterBegin;
                 func(entity);
             }
         }
@@ -542,7 +541,7 @@ namespace Giraffe {
                          iterEnd = Iterator<PredicateTwo>(_entities.end(), _entities.end(), predicate);
                  iterBegin != iterEnd;
                  ++iterBegin) {
-                Giraffe::Entity &entity = *iterBegin;
+                const Giraffe::Entity &entity = *iterBegin;
                 func(entity);
             }
         }
