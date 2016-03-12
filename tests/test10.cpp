@@ -3,22 +3,22 @@
 //
 
 #include <gtest/gtest.h>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 TEST(StorageTest, RemoveRestoreEntityHavingComponents) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(): Engine::Component<Foo>() {}
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(): Giraffe::Component<Foo>() {}
     };
 
-    Engine::Storage storage;
+    Giraffe::Storage storage;
     storage.registerComponentKind<Foo>();
 
-    Engine::Entity e = storage.addEntity();
+    Giraffe::Entity e = storage.addEntity();
     e.addComponent<Foo>();
 
     storage.removeEntity(e);
-    Engine::Entity e1 = storage.addEntity();
+    Giraffe::Entity e1 = storage.addEntity();
 
     std::size_t result = 0;
     auto iterBegin = storage.begin<Foo>();

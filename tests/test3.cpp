@@ -4,18 +4,18 @@
 
 #include <gtest/gtest.h>
 #include <stdexcept>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 TEST(StorageTest, GetRegisteredComponentFromEntity) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(): Engine::Component<Foo>() {}
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(): Giraffe::Component<Foo>() {}
     };
 
-    Engine::Storage storage;
+    Giraffe::Storage storage;
     storage.registerComponentKind<Foo>();
 
-    Engine::Entity e = storage.addEntity();
+    Giraffe::Entity e = storage.addEntity();
     e.addComponent<Foo>();
     bool ok;
     try {

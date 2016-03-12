@@ -2,8 +2,8 @@
 // Created by varnie on 2/23/16.
 //
 
-#ifndef ECS_STORAGE_H
-#define ECS_STORAGE_H
+#ifndef ECS_GIRAFFE_H
+#define ECS_GIRAFFE_H
 
 #include <cstddef> //std::size_t
 #include <limits> //std::numeric_limits
@@ -29,7 +29,7 @@ namespace {
 }
 #endif
 
-namespace Engine {
+namespace Giraffe {
 
     static constexpr std::size_t MAX_COMPONENTS_COUNT = 64;
     static constexpr std::size_t COMPONENT_DOES_NOT_EXIST = std::numeric_limits<std::size_t>::max();
@@ -67,69 +67,17 @@ namespace Engine {
         virtual ~ComponentsPool() { }		
         virtual void removeComponent(std::size_t index) = 0;
     };
-	/*
-    template<class C>
-    class DerivedComponentsPool : public ComponentsPool {
-    public:
-        DerivedComponentsPool() : ComponentsPool(), _components(), _deletedComponentsIndexes() { }
 
-        template<typename ... Args>
-        std::size_t addComponent(Args &&... args) {
-						
-			if (!_deletedComponentsIndexes.empty()) {
-				//found
-				size_t positionIndex = _deletedComponentsIndexes.back();
-				_deletedComponentsIndexes.pop_back();
-                _components[positionIndex] = C(std::forward<Args>(args) ...);
-
-                return positionIndex;
-			} else {
-				//not found
-				_components.emplace_back(std::forward<Args>(args) ...);
-
-                return _components.size() - 1;
-			}
-        }
-        
-        void removeComponent(std::size_t index) override {
-			assert(index < _components.size());
-           // _components[index].~C();
-			_deletedComponentsIndexes.emplace_back(index);
-		}
-
-        C *getComponent(std::size_t index) {
-            assert(index < _components.size());
-            return &_components[index];
-        }
-
-        std::size_t getSize() const {
-            return _components.size() - _deletedComponentsIndexes.size();
-        }
-
-        static std::size_t getKindIndex() {
-            return index;
-        }
-
-        static std::size_t index;
-    private:
-        std::vector<C> _components;
-        std::vector<std::size_t> _deletedComponentsIndexes;
-    };
-
-    template<class C>
-    std::size_t DerivedComponentsPool<C>::index = COMPONENT_DOES_NOT_EXIST;
-	*/
-	
     //
     template<class C>
-    class DerivedComponentsPoolNEW : public ComponentsPool {
+    class DerivedComponentsPool : public ComponentsPool {
 		struct Chunk {
             char mem[sizeof(C)];
         };
     public:
-        DerivedComponentsPoolNEW() : ComponentsPool(), _memoryBlock(), _deletedComponentsIndexes() { }
+        DerivedComponentsPool() : ComponentsPool(), _memoryBlock(), _deletedComponentsIndexes() { }
 
-        ~DerivedComponentsPoolNEW() {
+        ~DerivedComponentsPool() {
             if (!_memoryBlock.empty()) {
 				if (!_deletedComponentsIndexes.empty()) {
 					size_t index = _memoryBlock.size() - 1;
@@ -198,7 +146,7 @@ namespace Engine {
     };
 
     template<class C>
-    std::size_t DerivedComponentsPoolNEW<C>::index = COMPONENT_DOES_NOT_EXIST;
+    std::size_t DerivedComponentsPool<C>::index = COMPONENT_DOES_NOT_EXIST;
     //
 
     class Storage {
@@ -374,19 +322,19 @@ namespace Engine {
             //
 
             //has the component kind/family been registered yet?
-            if (DerivedComponentsPoolNEW<C>::index == COMPONENT_DOES_NOT_EXIST) {
+            if (DerivedComponentsPool<C>::index == COMPONENT_DOES_NOT_EXIST) {
 
                 if (_componentsKindsCount == MAX_COMPONENTS_COUNT) {
                     throw std::runtime_error(
                             "Maximum number of components exceeded: " + std::to_string(MAX_COMPONENTS_COUNT));
                 }
 
-                DerivedComponentsPoolNEW<C>::index = _componentsKindsCount++;
+                DerivedComponentsPool<C>::index = _componentsKindsCount++;
 		
 #if __cplusplus == 201402L // C++14
-				_pools.emplace_back(std::make_unique<DerivedComponentsPoolNEW<C> >());
+				_pools.emplace_back(std::make_unique<DerivedComponentsPool<C> >());
 #else // C++11
-				_pools.emplace_back(make_unique<DerivedComponentsPoolNEW<C> >());
+				_pools.emplace_back(make_unique<DerivedComponentsPool<C> >());
 #endif
             }
         }
@@ -398,12 +346,12 @@ namespace Engine {
             static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
             //
 
-            std::size_t componentKindIndex = DerivedComponentsPoolNEW<C>::getKindIndex();
-            if (DerivedComponentsPoolNEW<C>::index == COMPONENT_DOES_NOT_EXIST) {
+            std::size_t componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
+            if (DerivedComponentsPool<C>::index == COMPONENT_DOES_NOT_EXIST) {
                 return 0;
             }
 
-            DerivedComponentsPoolNEW<C> *poolC = static_cast< DerivedComponentsPoolNEW<C> * >(_pools[componentKindIndex].get());
+            DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(_pools[componentKindIndex].get());
             return poolC->getSize();
         }
 
@@ -416,12 +364,12 @@ namespace Engine {
             static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
             //
 
-            std::size_t componentKindIndex = DerivedComponentsPoolNEW<C>::getKindIndex();
-            if (DerivedComponentsPoolNEW<C>::index == COMPONENT_DOES_NOT_EXIST) {
+            std::size_t componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
+            if (DerivedComponentsPool<C>::index == COMPONENT_DOES_NOT_EXIST) {
                 //an attempt to add non registered component
 
                 registerComponentKind<C>();
-                componentKindIndex = DerivedComponentsPoolNEW<C>::getKindIndex();
+                componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
 
                 for (auto &entityComponentMask: _entitiesComponentsMask) {
                     entityComponentMask.push_back(COMPONENT_DOES_NOT_EXIST);
@@ -433,7 +381,7 @@ namespace Engine {
 				}
 			}
 
-            DerivedComponentsPoolNEW<C> *poolC = static_cast< DerivedComponentsPoolNEW<C> * >(_pools[componentKindIndex].get());
+            DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(_pools[componentKindIndex].get());
             std::size_t componentIndex = poolC->addComponent(std::forward<Args>(args) ...);
             std::size_t entityIndex = entity._index;
             _entitiesComponentsMask[entityIndex][componentKindIndex] = componentIndex;
@@ -446,7 +394,7 @@ namespace Engine {
             static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
             //
 
-            std::size_t componentKindIndex = DerivedComponentsPoolNEW<C>::getKindIndex();
+            std::size_t componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
             if (componentKindIndex == COMPONENT_DOES_NOT_EXIST) {
                 return;
             }
@@ -459,7 +407,7 @@ namespace Engine {
                 entityComponentsMask[componentKindIndex] = COMPONENT_DOES_NOT_EXIST;
 
                 //no need to cast, i.e.:
-                //DerivedComponentsPoolNEW<C> *poolC = static_cast< DerivedComponentsPoolNEW<C> * >(_pools[componentKindIndex].get());
+                //DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(_pools[componentKindIndex].get());
                 //poolC->removeComponent(curComponentIndex);
 
                 _pools[componentKindIndex]->removeComponent(curComponentIndex);
@@ -473,7 +421,7 @@ namespace Engine {
             static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
             //
 
-            std::size_t componentKindIndex = DerivedComponentsPoolNEW<C>::getKindIndex();
+            std::size_t componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
             std::size_t entityIndex = entity._index;
 
             return componentKindIndex != COMPONENT_DOES_NOT_EXIST
@@ -483,7 +431,7 @@ namespace Engine {
         template<typename C>
         C *getComponent(const Entity &entity) const {
 
-            std::size_t componentKindIndex = DerivedComponentsPoolNEW<C>::getKindIndex();
+            std::size_t componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
 
             if (componentKindIndex != COMPONENT_DOES_NOT_EXIST) {
 
@@ -491,7 +439,7 @@ namespace Engine {
                 std::size_t componentIndex = _entitiesComponentsMask[entityIndex][componentKindIndex];
 
                 if (componentIndex != COMPONENT_DOES_NOT_EXIST) {
-                    DerivedComponentsPoolNEW<C> *poolC = static_cast< DerivedComponentsPoolNEW<C> * >(_pools[componentKindIndex].get());
+                    DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(_pools[componentKindIndex].get());
                     return poolC->getComponent(componentIndex);
                 }
 
@@ -507,10 +455,10 @@ namespace Engine {
         template<class A1, class A2, class A3, class ...Ax>
         Iterator<PredicateAll> begin() {
 
-            PredicateAll<Entity> predicate(*this, {DerivedComponentsPoolNEW<A1>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<A2>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<A3>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<Ax>::getKindIndex() ...});
+            PredicateAll<Entity> predicate(*this, {DerivedComponentsPool<A1>::getKindIndex(),
+                                                   DerivedComponentsPool<A2>::getKindIndex(),
+                                                   DerivedComponentsPool<A3>::getKindIndex(),
+                                                   DerivedComponentsPool<Ax>::getKindIndex() ...});
             return Iterator<PredicateAll>(_entities.begin(), _entities.end(), predicate);
         }
 
@@ -518,8 +466,8 @@ namespace Engine {
         template<class A1, class A2>
         Iterator<PredicateTwo> begin() {
 
-            PredicateTwo<Entity> predicate(*this, DerivedComponentsPoolNEW<A1>::getKindIndex(),
-                                           DerivedComponentsPoolNEW<A2>::getKindIndex());
+            PredicateTwo<Entity> predicate(*this, DerivedComponentsPool<A1>::getKindIndex(),
+                                           DerivedComponentsPool<A2>::getKindIndex());
             return Iterator<PredicateTwo>(_entities.begin(), _entities.end(), predicate);
         }
 
@@ -527,7 +475,7 @@ namespace Engine {
         template<class A>
         Iterator<PredicateOne> begin() {
 
-            PredicateOne<Entity> predicate(*this, DerivedComponentsPoolNEW<A>::getKindIndex());
+            PredicateOne<Entity> predicate(*this, DerivedComponentsPool<A>::getKindIndex());
             return Iterator<PredicateOne>(_entities.begin(), _entities.end(), predicate);
         }
 
@@ -535,10 +483,10 @@ namespace Engine {
         template<class A1, class A2, class A3, class ...Ax>
         Iterator<PredicateAll> end() {
 
-            PredicateAll<Entity> predicate(*this, {DerivedComponentsPoolNEW<A1>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<A2>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<A3>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<Ax>::getKindIndex() ...});
+            PredicateAll<Entity> predicate(*this, {DerivedComponentsPool<A1>::getKindIndex(),
+                                                   DerivedComponentsPool<A2>::getKindIndex(),
+                                                   DerivedComponentsPool<A3>::getKindIndex(),
+                                                   DerivedComponentsPool<Ax>::getKindIndex() ...});
             return Iterator<PredicateAll>(_entities.end(), _entities.end(), predicate);
         }
 
@@ -546,8 +494,8 @@ namespace Engine {
         template<class A1, class A2>
         Iterator<PredicateTwo> end() {
 
-            PredicateTwo<Entity> predicate(*this, DerivedComponentsPoolNEW<A1>::getKindIndex(),
-                                           DerivedComponentsPoolNEW<A2>::getKindIndex());
+            PredicateTwo<Entity> predicate(*this, DerivedComponentsPool<A1>::getKindIndex(),
+                                           DerivedComponentsPool<A2>::getKindIndex());
             return Iterator<PredicateTwo>(_entities.end(), _entities.end(), predicate);
         }
 
@@ -555,7 +503,7 @@ namespace Engine {
         template<class A>
         Iterator<PredicateOne> end() {
 
-            PredicateOne<Entity> predicate(*this, DerivedComponentsPoolNEW<A>::getKindIndex());
+            PredicateOne<Entity> predicate(*this, DerivedComponentsPool<A>::getKindIndex());
             return Iterator<PredicateOne>(_entities.end(), _entities.end(), predicate);
         }
 
@@ -563,17 +511,17 @@ namespace Engine {
         template<class A1, class A2, class A3, class ...Ax>
         void process(std::function<void(const Entity &entity)> func) {
 
-            PredicateAll<Entity> predicate(*this, {DerivedComponentsPoolNEW<A1>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<A2>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<A3>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<Ax>::getKindIndex() ...});
+            PredicateAll<Entity> predicate(*this, {DerivedComponentsPool<A1>::getKindIndex(),
+                                                   DerivedComponentsPool<A2>::getKindIndex(),
+                                                   DerivedComponentsPool<A3>::getKindIndex(),
+                                                   DerivedComponentsPool<Ax>::getKindIndex() ...});
 
             for (Iterator<PredicateAll> iterBegin = Iterator<PredicateAll>(_entities.begin(), _entities.end(),
                                                                            predicate),
                          iterEnd = Iterator<PredicateAll>(_entities.end(), _entities.end(), predicate);
                  iterBegin != iterEnd;
                  ++iterBegin) {
-                Engine::Entity &entity = *iterBegin;
+                Giraffe::Entity &entity = *iterBegin;
                 func(entity);
             }
         }
@@ -582,15 +530,15 @@ namespace Engine {
         template<class A1, class A2>
         void process(std::function<void(const Entity &entity)> func) {
 
-            PredicateTwo<Entity> predicate(*this, DerivedComponentsPoolNEW<A1>::getKindIndex(),
-                                           DerivedComponentsPoolNEW<A2>::getKindIndex());
+            PredicateTwo<Entity> predicate(*this, DerivedComponentsPool<A1>::getKindIndex(),
+                                           DerivedComponentsPool<A2>::getKindIndex());
 
             for (Iterator<PredicateTwo> iterBegin = Iterator<PredicateTwo>(_entities.begin(), _entities.end(),
                                                                            predicate),
                          iterEnd = Iterator<PredicateTwo>(_entities.end(), _entities.end(), predicate);
                  iterBegin != iterEnd;
                  ++iterBegin) {
-                Engine::Entity &entity = *iterBegin;
+                Giraffe::Entity &entity = *iterBegin;
                 func(entity);
             }
         }
@@ -599,14 +547,14 @@ namespace Engine {
         template<class A>
         void process(std::function<void(const Entity &entity)> func) {
 
-            PredicateOne<Entity> predicate(*this, DerivedComponentsPoolNEW<A>::getKindIndex());
+            PredicateOne<Entity> predicate(*this, DerivedComponentsPool<A>::getKindIndex());
 
             for (Iterator<PredicateOne> iterBegin = Iterator<PredicateOne>(_entities.begin(), _entities.end(),
                                                                            predicate),
                          iterEnd = Iterator<PredicateOne>(_entities.end(), _entities.end(), predicate);
                  iterBegin != iterEnd;
                  ++iterBegin) {
-                const Engine::Entity &entity = *iterBegin;
+                const Giraffe::Entity &entity = *iterBegin;
                 func(entity);
             }
         }
@@ -627,10 +575,10 @@ namespace Engine {
         template<class A1, class A2, class A3, class ...Ax>
         Result<Iterator<PredicateAll>> range() {
 
-            PredicateAll<Entity> predicate(*this, {DerivedComponentsPoolNEW<A1>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<A2>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<A3>::getKindIndex(),
-                                                   DerivedComponentsPoolNEW<Ax>::getKindIndex() ...});
+            PredicateAll<Entity> predicate(*this, {DerivedComponentsPool<A1>::getKindIndex(),
+                                                   DerivedComponentsPool<A2>::getKindIndex(),
+                                                   DerivedComponentsPool<A3>::getKindIndex(),
+                                                   DerivedComponentsPool<Ax>::getKindIndex() ...});
 
             return Result<Iterator<PredicateAll>>(
                     Iterator<PredicateAll>(_entities.begin(), _entities.end(), predicate),
@@ -642,8 +590,8 @@ namespace Engine {
         template<class A1, class A2>
         Result<Iterator<PredicateTwo>> range() {
 
-            PredicateTwo<Entity> predicate(*this, DerivedComponentsPoolNEW<A1>::getKindIndex(),
-                                           DerivedComponentsPoolNEW<A2>::getKindIndex());
+            PredicateTwo<Entity> predicate(*this, DerivedComponentsPool<A1>::getKindIndex(),
+                                           DerivedComponentsPool<A2>::getKindIndex());
 
             return Result<Iterator<PredicateTwo>>(
                     Iterator<PredicateTwo>(_entities.begin(), _entities.end(), predicate),
@@ -655,7 +603,7 @@ namespace Engine {
         template<class A>
         Result<Iterator<PredicateOne>> range() {
 
-            PredicateOne<Entity> predicate(*this, DerivedComponentsPoolNEW<A>::getKindIndex());
+            PredicateOne<Entity> predicate(*this, DerivedComponentsPool<A>::getKindIndex());
 
             return Result<Iterator<PredicateOne>>(
                     Iterator<PredicateOne>(_entities.begin(), _entities.end(), predicate),
@@ -704,4 +652,4 @@ namespace Engine {
     }
 }
 
-#endif //ECS_STORAGE_H
+#endif //ECS_GIRAFFE_H

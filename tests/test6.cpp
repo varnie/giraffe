@@ -3,22 +3,22 @@
 //
 
 #include <gtest/gtest.h>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 TEST(StorageTest, SystemSearchComponent) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(): Engine::Component<Foo>() {}
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(): Giraffe::Component<Foo>() {}
     };
 
-    class FooSystem : public Engine::System {
+    class FooSystem : public Giraffe::System {
         std::size_t found;
     public:
-        FooSystem(Engine::Storage &storage): Engine::System(storage), found(0) {}
+        FooSystem(Giraffe::Storage &storage): Giraffe::System(storage), found(0) {}
 
         virtual void update(float f) {
             found = 0;
-            _storage.process<Foo>([&](const Engine::Entity &entity) {
+            _storage.process<Foo>([&](const Giraffe::Entity &entity) {
                 Foo *pFoo = _storage.getComponent<Foo>(entity);
                 (void) pFoo;
                 ++found;
@@ -30,10 +30,10 @@ TEST(StorageTest, SystemSearchComponent) {
         }
     };
 
-    Engine::Storage storage;
+    Giraffe::Storage storage;
     storage.registerComponentKind<Foo>();
 
-    Engine::Entity e = storage.addEntity();
+    Giraffe::Entity e = storage.addEntity();
     e.addComponent<Foo>();
 
     FooSystem system = FooSystem(storage);

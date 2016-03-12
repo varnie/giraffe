@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 #include <iostream>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 //TODO:
 TEST(StorageTest, ComponentsDestructorsInvocation1) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(int &result): Engine::Component<Foo>(), _pInt(new int(29)), _result(result) {
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(int &result): Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
@@ -37,9 +37,9 @@ TEST(StorageTest, ComponentsDestructorsInvocation1) {
 
     int result = 0;
     {
-        Engine::Storage storage;
+        Giraffe::Storage storage;
         storage.registerComponentKind<Foo>();
-        Engine::Entity e = storage.addEntity();
+        Giraffe::Entity e = storage.addEntity();
     }
 
     //checks that no destructors of components were called, because no components were added
@@ -48,8 +48,8 @@ TEST(StorageTest, ComponentsDestructorsInvocation1) {
 
 TEST(StorageTest, ComponentsDestructorsInvocation2) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(int &result): Engine::Component<Foo>(), _pInt(new int(29)), _result(result) {
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(int &result): Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
@@ -76,9 +76,9 @@ TEST(StorageTest, ComponentsDestructorsInvocation2) {
 
     int result = 0;
     {
-        Engine::Storage storage;
+        Giraffe::Storage storage;
         storage.registerComponentKind<Foo>();
-        Engine::Entity e = storage.addEntity();
+        Giraffe::Entity e = storage.addEntity();
         e.addComponent<Foo>(result);
     }
     //checks that 1 destructor of components was called at the end of scope, because only 1 component was added
@@ -87,8 +87,8 @@ TEST(StorageTest, ComponentsDestructorsInvocation2) {
 
 TEST(StorageTest, ComponentsDestructorsInvocation3) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(int &result): Engine::Component<Foo>(), _pInt(new int(29)), _result(result) {
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(int &result): Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
@@ -116,9 +116,9 @@ TEST(StorageTest, ComponentsDestructorsInvocation3) {
     int result = 0;
 
     //checks that explicit removeComponent calls the dtor
-    Engine::Storage storage;
+    Giraffe::Storage storage;
     storage.registerComponentKind<Foo>();
-    Engine::Entity e = storage.addEntity();
+    Giraffe::Entity e = storage.addEntity();
     e.addComponent<Foo>(result);
     //must explicitly call the dtor
     e.removeComponent<Foo>();
@@ -128,8 +128,8 @@ TEST(StorageTest, ComponentsDestructorsInvocation3) {
 
 TEST(StorageTest, ComponentsDestructorsInvocation4) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(int &result): Engine::Component<Foo>(), _pInt(new int(29)), _result(result) {
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(int &result): Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
@@ -157,9 +157,9 @@ TEST(StorageTest, ComponentsDestructorsInvocation4) {
     int result = 0;
 
     {
-        Engine::Storage storage;
+        Giraffe::Storage storage;
         storage.registerComponentKind<Foo>();
-        Engine::Entity e = storage.addEntity();
+        Giraffe::Entity e = storage.addEntity();
         e.addComponent<Foo>(result);
         e.removeComponent<Foo>();
         e.addComponent<Foo>(result);

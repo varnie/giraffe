@@ -3,27 +3,27 @@
 //
 
 #include <gtest/gtest.h>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 TEST(StorageTest, AddNonRegisteredComponentToEntity) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(): Engine::Component<Foo>() {}
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(): Giraffe::Component<Foo>() {}
     };
 
-    struct Bar : public Engine::Component<Bar> {
-        Bar(): Engine::Component<Bar>() {}
+    struct Bar : public Giraffe::Component<Bar> {
+        Bar(): Giraffe::Component<Bar>() {}
     };
 
-    Engine::Storage storage;
-    Engine::Entity e1 = storage.addEntity();
+    Giraffe::Storage storage;
+    Giraffe::Entity e1 = storage.addEntity();
     //storage.registerComponentKind<Foo>(); //it is intentionally absent!
     e1.addComponent<Foo>();
 
-    Engine::Entity e2 = storage.addEntity();
+    Giraffe::Entity e2 = storage.addEntity();
 
-    std::size_t componentFooKindIndex = Engine::DerivedComponentsPoolNEW<Foo>::index;
-    std::size_t componentBarKindIndex = Engine::DerivedComponentsPoolNEW<Bar>::index;
+    std::size_t componentFooKindIndex = Giraffe::DerivedComponentsPool<Foo>::index;
+    std::size_t componentBarKindIndex = Giraffe::DerivedComponentsPool<Bar>::index;
 
     std::size_t fooCount = 0;
     for (const auto &entity: storage.range<Foo>()) {
@@ -32,7 +32,7 @@ TEST(StorageTest, AddNonRegisteredComponentToEntity) {
 
     EXPECT_EQ(fooCount, 1);
     EXPECT_EQ(componentFooKindIndex, 0);
-    EXPECT_EQ(componentBarKindIndex, Engine::COMPONENT_DOES_NOT_EXIST);
+    EXPECT_EQ(componentBarKindIndex, Giraffe::COMPONENT_DOES_NOT_EXIST);
 }
 
 int main(int argc, char **argv) {

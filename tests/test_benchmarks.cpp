@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <chrono>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 class Timer {
 	public:
@@ -35,7 +35,7 @@ struct AutoTimer {
 
 TEST(StorageTest, TestCreateEntities) {
    
-    Engine::Storage storage;
+    Giraffe::Storage storage;
     AutoTimer t;
 
     std::uint64_t count = 10000000L;
@@ -50,10 +50,10 @@ TEST(StorageTest, TestCreateEntities) {
 
 TEST(StorageTest, TestDestroyEntities) {
 	
-	Engine::Storage storage;
+	Giraffe::Storage storage;
     
     std::uint64_t count = 10000000L;
-    std::vector<Engine::Entity> entities;
+    std::vector<Giraffe::Entity> entities;
     for (std::uint64_t i = 0; i < count; i++) {
         entities.push_back(storage.addEntity());
     }
@@ -70,11 +70,11 @@ TEST(StorageTest, TestDestroyEntities) {
 
 TEST(StorageTest, TestEntityIteration) {
 	
-	struct Position : public Engine::Component<Position> {
-        Position(): Engine::Component<Position>() {}
+	struct Position : public Giraffe::Component<Position> {
+        Position(): Giraffe::Component<Position>() {}
     };
 	
-	Engine::Storage storage;
+	Giraffe::Storage storage;
 	
     int count = 10000000;
     for (int i = 0; i < count; i++) {
@@ -85,7 +85,7 @@ TEST(StorageTest, TestEntityIteration) {
     AutoTimer t;
     std::cout << "iterating over " << count << " entities, unpacking one component" << std::endl;
     
-    for (const Engine::Entity &e: storage.range<Position>()) {
+    for (const Giraffe::Entity &e: storage.range<Position>()) {
         auto *pPosition = e.getComponent<Position>();
         (void) pPosition;
          ASSERT_TRUE(pPosition != nullptr);
@@ -96,16 +96,16 @@ TEST(StorageTest, TestEntityIteration) {
 
 TEST(StorageTest, TestEntityIterationUnpackTwo) {
 	
-	struct Position : public Engine::Component<Position> {
-        Position(): Engine::Component<Position>() {}
+	struct Position : public Giraffe::Component<Position> {
+        Position(): Giraffe::Component<Position>() {}
     };
     
     
-	struct Duration : public Engine::Component<Duration> {
-        Duration(): Engine::Component<Duration>() {}
+	struct Duration : public Giraffe::Component<Duration> {
+        Duration(): Giraffe::Component<Duration>() {}
     };
 	
-	Engine::Storage storage;
+	Giraffe::Storage storage;
 	
     int count = 10000000;
     for (int i = 0; i < count; i++) {
@@ -117,7 +117,7 @@ TEST(StorageTest, TestEntityIterationUnpackTwo) {
     AutoTimer t;
     std::cout << "iterating over " << count << " entities, unpacking two components" << std::endl;
     
-    for (const Engine::Entity &e: storage.range<Position, Duration>()) {
+    for (const Giraffe::Entity &e: storage.range<Position, Duration>()) {
          auto *pPosition = e.getComponent<Position>();
         (void) pPosition;
          ASSERT_TRUE(pPosition != nullptr);
@@ -132,21 +132,21 @@ TEST(StorageTest, TestEntityIterationUnpackTwo) {
 
 TEST(StorageTest, TestEntityIterationUnpackThree) {
 
-    struct Position : public Engine::Component<Position> {
-        Position(): Engine::Component<Position>() {}
+    struct Position : public Giraffe::Component<Position> {
+        Position(): Giraffe::Component<Position>() {}
     };
 
 
-    struct Duration : public Engine::Component<Duration> {
-        Duration(): Engine::Component<Duration>() {}
+    struct Duration : public Giraffe::Component<Duration> {
+        Duration(): Giraffe::Component<Duration>() {}
     };
 
-    struct Weight : public Engine::Component<Weight> {
-        Weight(): Engine::Component<Weight>() {}
+    struct Weight : public Giraffe::Component<Weight> {
+        Weight(): Giraffe::Component<Weight>() {}
     };
 
 
-    Engine::Storage storage;
+    Giraffe::Storage storage;
 
     int count = 10000000;
     for (int i = 0; i < count; i++) {
@@ -159,7 +159,7 @@ TEST(StorageTest, TestEntityIterationUnpackThree) {
     AutoTimer t;
     std::cout << "iterating over " << count << " entities, unpacking three components" << std::endl;
 
-    for (const Engine::Entity &e: storage.range<Position, Duration, Weight>()) {
+    for (const Giraffe::Entity &e: storage.range<Position, Duration, Weight>()) {
          auto *pPosition = e.getComponent<Position>();
         (void) pPosition;
          ASSERT_TRUE(pPosition != nullptr);

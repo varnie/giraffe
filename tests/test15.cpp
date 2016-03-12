@@ -3,22 +3,22 @@
 //
 
 #include <gtest/gtest.h>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 TEST(StorageTest, EntityRemoveRecreateComponent) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(): Engine::Component<Foo>() {}
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(): Giraffe::Component<Foo>() {}
     };
 
-    class FooSystem : public Engine::System {
+    class FooSystem : public Giraffe::System {
         std::size_t found;
     public:
-        FooSystem(Engine::Storage &storage): Engine::System(storage), found(0) {}
+        FooSystem(Giraffe::Storage &storage): Giraffe::System(storage), found(0) {}
 
         virtual void update(float f) {
             found = 0;
-            _storage.process<Foo>([&](const Engine::Entity &entity) {
+            _storage.process<Foo>([&](const Giraffe::Entity &entity) {
                 Foo *pFoo = _storage.getComponent<Foo>(entity);
                 (void) pFoo; //so that the compiler don't optimize out the line above
                 ++found;
@@ -30,18 +30,18 @@ TEST(StorageTest, EntityRemoveRecreateComponent) {
         }
     };
 
-    Engine::Storage storage;
+    Giraffe::Storage storage;
     storage.registerComponentKind<Foo>();
 
     std::size_t poolSize1 = storage.getPoolSize<Foo>();
 
-    Engine::Entity e1 = storage.addEntity();
+    Giraffe::Entity e1 = storage.addEntity();
     e1.addComponent<Foo>();
     e1.removeComponent<Foo>();
 
     std::size_t poolSize2 = storage.getPoolSize<Foo>();
        
-    Engine::Entity e2 = storage.addEntity();
+    Giraffe::Entity e2 = storage.addEntity();
     e2.addComponent<Foo>();
 
     std::size_t poolSize3 = storage.getPoolSize<Foo>();

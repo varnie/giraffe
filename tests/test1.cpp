@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <stdexcept>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 TEST(StorageTest, retrieveNonRegisteredComponent_case_a) {
     //component retrieval from storage must fail if one of the following cases is true:
@@ -13,14 +13,14 @@ TEST(StorageTest, retrieveNonRegisteredComponent_case_a) {
 
     //this case checks the first case, a)
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(): Engine::Component<Foo>() {}
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(): Giraffe::Component<Foo>() {}
     };
 
-    Engine::Storage storage;
+    Giraffe::Storage storage;
     //storage.registerComponentKind<Foo>(); //intentionally commented out
 
-    Engine::Entity e = storage.addEntity();
+    Giraffe::Entity e = storage.addEntity();
 
     bool mustThrow;
     try {

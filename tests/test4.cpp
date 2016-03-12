@@ -3,20 +3,20 @@
 //
 
 #include <gtest/gtest.h>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 TEST(StorageTest, RegisterTheSameComponentInStorage) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(): Engine::Component<Foo>() {}
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(): Giraffe::Component<Foo>() {}
     };
 
-    Engine::Storage storage;
+    Giraffe::Storage storage;
     for (int i = 0; i < 10; ++i) {
         storage.registerComponentKind<Foo>();
     }
 
-    std::size_t componentKindIndex = Engine::DerivedComponentsPoolNEW<Foo>::index;
+    std::size_t componentKindIndex = Giraffe::DerivedComponentsPool<Foo>::index;
 
     EXPECT_EQ(componentKindIndex, 0);
 }

@@ -3,16 +3,16 @@
 //
 
 #include <gtest/gtest.h>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 TEST(StorageTest, EntityRemoveNonRegisteredAndNonAddedToEntityComponent) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(): Engine::Component<Foo>() {}
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(): Giraffe::Component<Foo>() {}
     };
 
-    Engine::Storage storage;
-    Engine::Entity e = storage.addEntity();
+    Giraffe::Storage storage;
+    Giraffe::Entity e = storage.addEntity();
 
     e.removeComponent<Foo>();
 

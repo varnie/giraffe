@@ -3,22 +3,22 @@
 //
 
 #include <gtest/gtest.h>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 TEST(StorageTest, StorageRetrievals) {
 
-    struct Foo : public Engine::Component<Foo> {
-        Foo(): Engine::Component<Foo>() {}
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(): Giraffe::Component<Foo>() {}
     };
 
-    class FooSystem : public Engine::System {
+    class FooSystem : public Giraffe::System {
         std::size_t found;
     public:
-        FooSystem(Engine::Storage &storage): Engine::System(storage), found(0) {}
+        FooSystem(Giraffe::Storage &storage): Giraffe::System(storage), found(0) {}
 
         virtual void update(float f) {
             found = 0;
-            _storage.process<Foo>([&](const Engine::Entity &entity) {
+            _storage.process<Foo>([&](const Giraffe::Entity &entity) {
                 ++found;
             });
         }
@@ -28,16 +28,16 @@ TEST(StorageTest, StorageRetrievals) {
         }
     };
 
-    Engine::Storage storage;
+    Giraffe::Storage storage;
     storage.registerComponentKind<Foo>();
 
-    Engine::Entity e1 = storage.addEntity();
+    Giraffe::Entity e1 = storage.addEntity();
     e1.addComponent<Foo>();
-    Engine::Entity e2 = storage.addEntity();
+    Giraffe::Entity e2 = storage.addEntity();
     e2.addComponent<Foo>();
-    Engine::Entity e3 = storage.addEntity();
+    Giraffe::Entity e3 = storage.addEntity();
     e3.addComponent<Foo>();
-    Engine::Entity e4 = storage.addEntity();
+    Giraffe::Entity e4 = storage.addEntity();
 
     std::size_t result1 = 0, result2 = 0, result3 = 0;
     //using storage system

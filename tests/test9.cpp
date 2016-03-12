@@ -3,16 +3,16 @@
 //
 
 #include <gtest/gtest.h>
-#include "../include/Storage.h"
+#include "../include/Giraffe.h"
 
 TEST(StorageTest, RemoveRestoreEntity) {
 
-    Engine::Storage storage;
-    Engine::Entity e1 = storage.addEntity();
-    Engine::Entity e2 = storage.addEntity();
-    Engine::Entity e3 = storage.addEntity();
+    Giraffe::Storage storage;
+    Giraffe::Entity e1 = storage.addEntity();
+    Giraffe::Entity e2 = storage.addEntity();
+    Giraffe::Entity e3 = storage.addEntity();
     storage.removeEntity(e2);
-    Engine::Entity e4 = storage.addEntity();
+    Giraffe::Entity e4 = storage.addEntity();
 
     EXPECT_EQ(e4._index, 1);
 }
