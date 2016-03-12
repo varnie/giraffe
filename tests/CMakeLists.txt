@@ -1,6 +1,7 @@
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O2")
-add_definitions(${GCC_CPP11_LINK_FLAGS})
 
 # Locate GTest
 find_package(GTest REQUIRED)
