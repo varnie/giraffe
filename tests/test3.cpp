@@ -9,7 +9,7 @@
 TEST(StorageTest, GetRegisteredComponentFromEntity) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(): Giraffe::Component<Foo>() {}
+        Foo() : Giraffe::Component<Foo>() { }
     };
 
     Giraffe::Storage storage;

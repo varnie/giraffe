@@ -8,16 +8,16 @@
 TEST(StorageTest, CheckAddingTheSameComponentToEntity) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(): Giraffe::Component<Foo>() {}
+        Foo() : Giraffe::Component<Foo>() { }
     };
 
     Giraffe::Storage storage;
     storage.registerComponentKind<Foo>();
-    
+
     Giraffe::Entity e = storage.addEntity();
     e.addComponent<Foo>();
     e.addComponent<Foo>();
-    
+
     std::size_t poolSize = storage.getPoolSize<Foo>();
 
     EXPECT_EQ(poolSize, 1);

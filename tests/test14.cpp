@@ -8,15 +8,15 @@
 TEST(StorageTest, EntityHasComponents) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(): Giraffe::Component<Foo>() {}
+        Foo() : Giraffe::Component<Foo>() { }
     };
 
     struct Bar : public Giraffe::Component<Bar> {
-        Bar(): Giraffe::Component<Bar>() {}
+        Bar() : Giraffe::Component<Bar>() { }
     };
 
     struct Fred : public Giraffe::Component<Fred> {
-        Fred(): Giraffe::Component<Fred>() {}
+        Fred() : Giraffe::Component<Fred>() { }
     };
 
     Giraffe::Storage storage;

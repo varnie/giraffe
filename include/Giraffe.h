@@ -22,10 +22,10 @@
 #if __cplusplus == 201103L // C++11
 //for old compilers
 namespace {
-	template<typename T, typename... Args>
-	std::unique_ptr<T> make_unique(Args&&... args) {
-		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-	}
+    template<typename T, typename... Args>
+    std::unique_ptr<T> make_unique(Args &&... args) {
+        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    }
 }
 #endif
 
@@ -39,8 +39,9 @@ namespace Giraffe {
         //virtual dtor not needed
         //virtual ~Component() {}
     };
-    
+
     class Storage;
+
     struct Entity {
         Entity(std::size_t index, Storage &storage)
                 : _index(index), _storage(&storage) { }
@@ -60,18 +61,19 @@ namespace Giraffe {
         std::size_t _index;
         Storage *_storage;
     };
-    
+
     //
     class ComponentsPool {
     public:
-        virtual ~ComponentsPool() { }		
+        virtual ~ComponentsPool() { }
+
         virtual void removeComponent(std::size_t index) = 0;
     };
 
     //
     template<class C>
     class DerivedComponentsPool : public ComponentsPool {
-		struct Chunk {
+        struct Chunk {
             char mem[sizeof(C)];
         };
     public:
@@ -79,20 +81,21 @@ namespace Giraffe {
 
         ~DerivedComponentsPool() {
             if (!_memoryBlock.empty()) {
-				if (!_deletedComponentsIndexes.empty()) {
-					size_t index = _memoryBlock.size() - 1;
-					for(auto rit = _memoryBlock.rbegin(), rend = _memoryBlock.rend(); rit != rend; ++rit, --index) {
-						if (std::find(_deletedComponentsIndexes.begin(), _deletedComponentsIndexes.end(), index) == _deletedComponentsIndexes.end()) {
-							C *component = reinterpret_cast<C *>(&*rit);
-							component->~C();
-						}
-					}
-				} else {					
-					for(auto rit = _memoryBlock.rbegin(), rend = _memoryBlock.rend(); rit != rend; ++rit) {
-						C *component = reinterpret_cast<C *>(&*rit);
-						component->~C();
-					}
-				}
+                if (!_deletedComponentsIndexes.empty()) {
+                    size_t index = _memoryBlock.size() - 1;
+                    for (auto rit = _memoryBlock.rbegin(), rend = _memoryBlock.rend(); rit != rend; ++rit, --index) {
+                        if (std::find(_deletedComponentsIndexes.begin(), _deletedComponentsIndexes.end(), index) ==
+                            _deletedComponentsIndexes.end()) {
+                            C *component = reinterpret_cast<C *>(&*rit);
+                            component->~C();
+                        }
+                    }
+                } else {
+                    for (auto rit = _memoryBlock.rbegin(), rend = _memoryBlock.rend(); rit != rend; ++rit) {
+                        C *component = reinterpret_cast<C *>(&*rit);
+                        component->~C();
+                    }
+                }
             }
         }
 
@@ -302,12 +305,12 @@ namespace Giraffe {
 
                 //remove all entity's components from the pools
                 for (std::size_t i = 0, count = componentsMask.size(); i < count; ++i) {
-					std::size_t curComponentIndex = componentsMask[i];
-					if (curComponentIndex != COMPONENT_DOES_NOT_EXIST) {
-						//tricky
-						_pools[i]->removeComponent(curComponentIndex);
-					}
-				}
+                    std::size_t curComponentIndex = componentsMask[i];
+                    if (curComponentIndex != COMPONENT_DOES_NOT_EXIST) {
+                        //tricky
+                        _pools[i]->removeComponent(curComponentIndex);
+                    }
+                }
 
                 //reset the mask
                 componentsMask.assign(componentsMask.size(), COMPONENT_DOES_NOT_EXIST);
@@ -330,11 +333,11 @@ namespace Giraffe {
                 }
 
                 DerivedComponentsPool<C>::index = _componentsKindsCount++;
-		
+
 #if __cplusplus == 201402L // C++14
-				_pools.emplace_back(std::make_unique<DerivedComponentsPool<C> >());
+                _pools.emplace_back(std::make_unique<DerivedComponentsPool<C> >());
 #else // C++11
-				_pools.emplace_back(make_unique<DerivedComponentsPool<C> >());
+                _pools.emplace_back(make_unique<DerivedComponentsPool<C> >());
 #endif
             }
         }
@@ -355,8 +358,8 @@ namespace Giraffe {
             return poolC->getSize();
         }
 
-		//TODO: check that recreation of component on an entity which was deleted, works
-		//ie: oldEntity.addComponent<Foo>(); storage.removeEntity(oldEntity); newEntity = storage.addEntity(); newEntity.addComponent<Foo>() puts a newly allocated component instead of an older one
+        //TODO: check that recreation of component on an entity which was deleted, works
+        //ie: oldEntity.addComponent<Foo>(); storage.removeEntity(oldEntity); newEntity = storage.addEntity(); newEntity.addComponent<Foo>() puts a newly allocated component instead of an older one
         template<typename C, typename ... Args>
         void addComponent(const Entity &entity, Args &&... args) {
 
@@ -374,12 +377,12 @@ namespace Giraffe {
                 for (auto &entityComponentMask: _entitiesComponentsMask) {
                     entityComponentMask.push_back(COMPONENT_DOES_NOT_EXIST);
                 }
-            } else {                       
-				if (_entitiesComponentsMask[entity._index][componentKindIndex] != COMPONENT_DOES_NOT_EXIST) {
-					//entity already has a component
-					return;
-				}
-			}
+            } else {
+                if (_entitiesComponentsMask[entity._index][componentKindIndex] != COMPONENT_DOES_NOT_EXIST) {
+                    //entity already has a component
+                    return;
+                }
+            }
 
             DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(_pools[componentKindIndex].get());
             std::size_t componentIndex = poolC->addComponent(std::forward<Args>(args) ...);
@@ -401,7 +404,7 @@ namespace Giraffe {
 
             std::size_t entityIndex = entity._index;
             auto &entityComponentsMask = _entitiesComponentsMask[entityIndex];
-            std::size_t curComponentIndex = entityComponentsMask[componentKindIndex];            
+            std::size_t curComponentIndex = entityComponentsMask[componentKindIndex];
 
             if (curComponentIndex != COMPONENT_DOES_NOT_EXIST) {
                 entityComponentsMask[componentKindIndex] = COMPONENT_DOES_NOT_EXIST;
@@ -624,7 +627,9 @@ namespace Giraffe {
     class System {
     public:
         System(Storage &storage) : _storage(storage) { }
+
         virtual ~System() { }
+
         virtual void update(float f) = 0;
 
     protected:

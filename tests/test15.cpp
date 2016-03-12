@@ -8,13 +8,13 @@
 TEST(StorageTest, EntityRemoveRecreateComponent) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(): Giraffe::Component<Foo>() {}
+        Foo() : Giraffe::Component<Foo>() { }
     };
 
     class FooSystem : public Giraffe::System {
         std::size_t found;
     public:
-        FooSystem(Giraffe::Storage &storage): Giraffe::System(storage), found(0) {}
+        FooSystem(Giraffe::Storage &storage) : Giraffe::System(storage), found(0) { }
 
         virtual void update(float f) {
             found = 0;
@@ -40,7 +40,7 @@ TEST(StorageTest, EntityRemoveRecreateComponent) {
     e1.removeComponent<Foo>();
 
     std::size_t poolSize2 = storage.getPoolSize<Foo>();
-       
+
     Giraffe::Entity e2 = storage.addEntity();
     e2.addComponent<Foo>();
 

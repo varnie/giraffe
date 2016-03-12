@@ -10,27 +10,31 @@
 TEST(StorageTest, ComponentsDestructorsInvocation1) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result): Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
+        Foo(int &result) : Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
+
         Foo(const Foo &other) : _pInt(new int(*other._pInt)), _result(other._result) {
 
             std::cout << "Foo copy-ctor" << std::endl;
         }
-        Foo& operator=(const Foo& other) {
+
+        Foo &operator=(const Foo &other) {
             std::cout << "Foo copy assign" << std::endl;
             delete _pInt;
             _pInt = new int(*other._pInt);
             _result = other._result;
             return *this;
         }
+
     public:
         ~Foo() {
             delete _pInt;
             std::cout << "Foo ~dtor" << std::endl;
             _result++;
         }
+
         int *_pInt;
         int &_result;
     };
@@ -49,27 +53,31 @@ TEST(StorageTest, ComponentsDestructorsInvocation1) {
 TEST(StorageTest, ComponentsDestructorsInvocation2) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result): Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
+        Foo(int &result) : Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
+
         Foo(const Foo &other) : _pInt(new int(*other._pInt)), _result(other._result) {
 
             std::cout << "Foo copy-ctor" << std::endl;
         }
-        Foo& operator=(const Foo& other) {
+
+        Foo &operator=(const Foo &other) {
             std::cout << "Foo copy assign" << std::endl;
             delete _pInt;
             _pInt = new int(*other._pInt);
             _result = other._result;
             return *this;
         }
+
     public:
         ~Foo() {
             delete _pInt;
             std::cout << "Foo ~dtor" << std::endl;
             _result++;
         }
+
         int *_pInt;
         int &_result;
     };
@@ -88,27 +96,31 @@ TEST(StorageTest, ComponentsDestructorsInvocation2) {
 TEST(StorageTest, ComponentsDestructorsInvocation3) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result): Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
+        Foo(int &result) : Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
+
         Foo(const Foo &other) : _pInt(new int(*other._pInt)), _result(other._result) {
 
             std::cout << "Foo copy-ctor" << std::endl;
         }
-        Foo& operator=(const Foo& other) {
+
+        Foo &operator=(const Foo &other) {
             std::cout << "Foo copy assign" << std::endl;
             delete _pInt;
             _pInt = new int(*other._pInt);
             _result = other._result;
             return *this;
         }
+
     public:
         ~Foo() {
             delete _pInt;
             std::cout << "Foo ~dtor" << std::endl;
             _result++;
         }
+
         int *_pInt;
         int &_result;
     };
@@ -129,27 +141,31 @@ TEST(StorageTest, ComponentsDestructorsInvocation3) {
 TEST(StorageTest, ComponentsDestructorsInvocation4) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result): Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
+        Foo(int &result) : Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
+
         Foo(const Foo &other) : _pInt(new int(*other._pInt)), _result(other._result) {
 
             std::cout << "Foo copy-ctor" << std::endl;
         }
-        Foo& operator=(const Foo& other) {
+
+        Foo &operator=(const Foo &other) {
             std::cout << "Foo copy assign" << std::endl;
             delete _pInt;
             _pInt = new int(*other._pInt);
             _result = other._result;
             return *this;
         }
+
     public:
         ~Foo() {
             delete _pInt;
             std::cout << "Foo ~dtor" << std::endl;
             _result++;
         }
+
         int *_pInt;
         int &_result;
     };

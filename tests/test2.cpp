@@ -16,7 +16,8 @@ TEST(StorageTest, retrieveNonRegisteredComponent_case_b) {
 
     struct Foo : public Giraffe::Component<Foo> {
         int i;
-        Foo(int i): Giraffe::Component<Foo>(), i(i) {}
+
+        Foo(int i) : Giraffe::Component<Foo>(), i(i) { }
     };
 
     Giraffe::Storage storage;
@@ -29,7 +30,7 @@ TEST(StorageTest, retrieveNonRegisteredComponent_case_b) {
     try {
         auto *pComp = e.getComponent<Foo>();
         mustThrow = false;
-    }   catch (const std::runtime_error &exc) {
+    } catch (const std::runtime_error &exc) {
         mustThrow = true;
     }
 
