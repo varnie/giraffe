@@ -14,7 +14,7 @@ TEST(StorageTest, RemoveRestoreEntity) {
     storage.removeEntity(e2);
     Giraffe::Entity e4 = storage.addEntity();
 
-    EXPECT_EQ(e4._index, 1);
+    EXPECT_EQ(e4.m_index, 1);
 }
 
 int main(int argc, char **argv) {

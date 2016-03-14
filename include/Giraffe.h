@@ -45,7 +45,7 @@ namespace Giraffe {
 
     struct Entity {
         Entity(std::size_t index, Storage &storage)
-                : _index(index), _storage(&storage) { }
+                : m_index(index), m_storage(&storage) { }
 
         template<typename C, typename ... Args>
         void addComponent(Args &&... args);
@@ -59,8 +59,8 @@ namespace Giraffe {
         template<typename C>
         bool hasComponent() const;
 
-        std::size_t _index;
-        Storage *_storage;
+        std::size_t m_index;
+        Storage *m_storage;
     };
 
     //
@@ -78,21 +78,21 @@ namespace Giraffe {
             char mem[sizeof(C)];
         };
     public:
-        DerivedComponentsPool() : ComponentsPool(), _memoryBlock(), _deletedComponentsIndexes() { }
+        DerivedComponentsPool() : ComponentsPool(), m_memoryBlock(), m_deletedComponentsIndexes() { }
 
         ~DerivedComponentsPool() {
-            if (!_memoryBlock.empty()) {
-                if (!_deletedComponentsIndexes.empty()) {
-                    size_t index = _memoryBlock.size() - 1;
-                    for (auto rit = _memoryBlock.rbegin(), rend = _memoryBlock.rend(); rit != rend; ++rit, --index) {
-                        if (std::find(_deletedComponentsIndexes.begin(), _deletedComponentsIndexes.end(), index) ==
-                            _deletedComponentsIndexes.end()) {
+            if (!m_memoryBlock.empty()) {
+                if (!m_deletedComponentsIndexes.empty()) {
+                    size_t index = m_memoryBlock.size() - 1;
+                    for (auto rit = m_memoryBlock.rbegin(), rend = m_memoryBlock.rend(); rit != rend; ++rit, --index) {
+                        if (std::find(m_deletedComponentsIndexes.begin(), m_deletedComponentsIndexes.end(), index) ==
+                            m_deletedComponentsIndexes.end()) {
                             C *component = reinterpret_cast<C *>(&*rit);
                             component->~C();
                         }
                     }
                 } else {
-                    for (auto rit = _memoryBlock.rbegin(), rend = _memoryBlock.rend(); rit != rend; ++rit) {
+                    for (auto rit = m_memoryBlock.rbegin(), rend = m_memoryBlock.rend(); rit != rend; ++rit) {
                         C *component = reinterpret_cast<C *>(&*rit);
                         component->~C();
                     }
@@ -103,39 +103,39 @@ namespace Giraffe {
         template<typename ... Args>
         std::size_t addComponent(Args &&... args) {
 
-            if (!_deletedComponentsIndexes.empty()) {
+            if (!m_deletedComponentsIndexes.empty()) {
                 //reuse old block
-                size_t positionIndex = _deletedComponentsIndexes.back();
-                _deletedComponentsIndexes.pop_back();
-                void *block = static_cast<void *> (&_memoryBlock[positionIndex]);
+                size_t positionIndex = m_deletedComponentsIndexes.back();
+                m_deletedComponentsIndexes.pop_back();
+                void *block = static_cast<void *> (&m_memoryBlock[positionIndex]);
                 new(block) C(std::forward<Args>(args) ...);
 
                 return positionIndex;
             } else {
                 //not found, add new block
-                _memoryBlock.emplace_back();
+                m_memoryBlock.emplace_back();
 
-                void *block = static_cast<void *> (&_memoryBlock.back());
+                void *block = static_cast<void *> (&m_memoryBlock.back());
                 new(block) C(std::forward<Args>(args) ...);
 
-                return _memoryBlock.size() - 1;
+                return m_memoryBlock.size() - 1;
             }
         }
 
         void removeComponent(std::size_t index) override {
-            assert(index < _memoryBlock.size());
-            C *component = reinterpret_cast<C *>(&_memoryBlock[index]);
+            assert(index < m_memoryBlock.size());
+            C *component = reinterpret_cast<C *>(&m_memoryBlock[index]);
             component->~C();
-            _deletedComponentsIndexes.push_back(index);
+            m_deletedComponentsIndexes.push_back(index);
         }
 
         C *getComponent(std::size_t index) {
-            assert(index < _memoryBlock.size());
-            return reinterpret_cast<C *>(&_memoryBlock[index]);
+            assert(index < m_memoryBlock.size());
+            return reinterpret_cast<C *>(&m_memoryBlock[index]);
         }
 
         std::size_t getSize() const {
-            return _memoryBlock.size() - _deletedComponentsIndexes.size();
+            return m_memoryBlock.size() - m_deletedComponentsIndexes.size();
         }
 
         static std::size_t getKindIndex() {
@@ -144,8 +144,8 @@ namespace Giraffe {
 
         static std::size_t index;
     private:
-        std::vector<Chunk> _memoryBlock;
-        std::deque<std::size_t> _deletedComponentsIndexes;
+        std::vector<Chunk> m_memoryBlock;
+        std::deque<std::size_t> m_deletedComponentsIndexes;
     };
 
     template<class C>
@@ -164,16 +164,16 @@ namespace Giraffe {
             using pointer = typename std::iterator_traits<Iterator>::pointer;
 
             FilterIterator(Iterator current, Iterator end, Predicate pred) :
-                    _current(current), _end(end), _pred(pred) {
+                    m_current(current), m_end(end), m_pred(pred) {
 
-                while (_current != _end && !_pred(*_current)) {
-                    ++_current;
+                while (m_current != m_end && !m_pred(*m_current)) {
+                    ++m_current;
                 }
             }
 
-            reference operator*() const { return *_current; }
+            reference operator*() const { return *m_current; }
 
-            pointer operator->() const { return &*_current; }
+            pointer operator->() const { return &*m_current; }
 
             FilterIterator &operator++() {
                 advance();
@@ -186,20 +186,20 @@ namespace Giraffe {
                 return obj;
             }
 
-            bool operator==(const FilterIterator &rhs) const { return _current == rhs._current; }
+            bool operator==(const FilterIterator &rhs) const { return m_current == rhs.m_current; }
 
             bool operator!=(const FilterIterator &rhs) const { return !(operator==(rhs)); }
 
         private:
             void advance() {
                 do {
-                    ++_current;
-                } while (_current != _end && !_pred(*_current));
+                    ++m_current;
+                } while (m_current != m_end && !m_pred(*m_current));
             }
 
-            Iterator _current;
-            Iterator _end;
-            Predicate _pred;
+            Iterator m_current;
+            Iterator m_end;
+            Predicate m_pred;
         };
         //iterator
 
@@ -208,61 +208,61 @@ namespace Giraffe {
         class PredicateAll {
         public:
             PredicateAll(const Storage &storage, const std::initializer_list<std::size_t> &conditions)
-                    : _storage(storage), _conditions(conditions) { }
+                    : m_storage(storage), m_conditions(conditions) { }
 
             bool operator()(const T &e) const {
 
-                std::size_t entityIndex = e._index;
-                const auto &entityComponentsMask = _storage._entitiesComponentsMask[entityIndex];
+                std::size_t entityIndex = e.m_index;
+                const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[entityIndex];
 
-                return std::all_of(_conditions.cbegin(), _conditions.cend(),
+                return std::all_of(m_conditions.cbegin(), m_conditions.cend(),
                                    [&entityComponentsMask](const std::size_t cond) {
                                        return entityComponentsMask[cond] != COMPONENT_DOES_NOT_EXIST;
                                    });
             }
 
         private:
-            const Storage &_storage;
-            std::vector<std::size_t> _conditions;
+            const Storage &m_storage;
+            std::vector<std::size_t> m_conditions;
         };
 
         template<typename T>
         class PredicateTwo {
         public:
             PredicateTwo(const Storage &storage, const std::size_t cond1, const std::size_t cond2)
-                    : _storage(storage), _cond1(cond1), _cond2(cond2) { }
+                    : m_storage(storage), m_cond1(cond1), m_cond2(cond2) { }
 
             bool operator()(const T &e) const {
 
-                std::size_t entityIndex = e._index;
-                const auto &entityComponentsMask = _storage._entitiesComponentsMask[entityIndex];
+                std::size_t entityIndex = e.m_index;
+                const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[entityIndex];
 
-                return entityComponentsMask[_cond1] != COMPONENT_DOES_NOT_EXIST &&
-                       entityComponentsMask[_cond2] != COMPONENT_DOES_NOT_EXIST;
+                return entityComponentsMask[m_cond1] != COMPONENT_DOES_NOT_EXIST &&
+                       entityComponentsMask[m_cond2] != COMPONENT_DOES_NOT_EXIST;
             }
 
         private:
-            const Storage &_storage;
-            std::size_t _cond1, _cond2;
+            const Storage &m_storage;
+            std::size_t m_cond1, m_cond2;
         };
 
         template<typename T>
         class PredicateOne {
         public:
             PredicateOne(const Storage &storage, const std::size_t condition)
-                    : _storage(storage), _condition(condition) { }
+                    : m_storage(storage), m_condition(condition) { }
 
             bool operator()(const T &e) const {
 
-                std::size_t entityIndex = e._index;
-                const auto &entityComponentsMask = _storage._entitiesComponentsMask[entityIndex];
+                std::size_t entityIndex = e.m_index;
+                const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[entityIndex];
 
-                return entityComponentsMask[_condition] != COMPONENT_DOES_NOT_EXIST;
+                return entityComponentsMask[m_condition] != COMPONENT_DOES_NOT_EXIST;
             }
 
         private:
-            const Storage &_storage;
-            std::size_t _condition;
+            const Storage &m_storage;
+            std::size_t m_condition;
         };
         //predicate
 
@@ -272,41 +272,41 @@ namespace Giraffe {
         template<template<class Item> class Predicate>
         using Iterator = FilterIterator<Entities_Iterator_t, Predicate<Entity> >;
 
-        Storage() : _entitiesComponentsMask(), _entities(), _componentsKindsCount(0), _deletedEntities(), _pools() { }
+        Storage() : m_entitiesComponentsMask(), m_entities(), m_componentsKindsCount(0), m_deletedEntities(), m_pools() { }
 
         Entity addEntity() {
 
-            if (!_deletedEntities.empty()) {
-                Entity entity = _deletedEntities.back();
-                _deletedEntities.pop_back();
-                _entities.push_back(entity);
+            if (!m_deletedEntities.empty()) {
+                Entity entity = m_deletedEntities.back();
+                m_deletedEntities.pop_back();
+                m_entities.push_back(entity);
             } else {
-                std::size_t curEntityIndex = _entities.size();
-                _entities.push_back(Entity(curEntityIndex, *this));
-                _entitiesComponentsMask.push_back(
-                        std::vector<std::size_t>(_componentsKindsCount, COMPONENT_DOES_NOT_EXIST));
+                std::size_t curEntityIndex = m_entities.size();
+                m_entities.push_back(Entity(curEntityIndex, *this));
+                m_entitiesComponentsMask.push_back(
+                        std::vector<std::size_t>(m_componentsKindsCount, COMPONENT_DOES_NOT_EXIST));
             }
 
-            return _entities.back();
+            return m_entities.back();
         }
 
         void removeEntity(const Entity &entity) {
 
-            std::size_t entityIndex = entity._index;
-            if (entityIndex < _entities.size()) {
-                std::swap(_entities[entityIndex], _entities.back());
-                _entities.pop_back();
+            std::size_t entityIndex = entity.m_index;
+            if (entityIndex < m_entities.size()) {
+                std::swap(m_entities[entityIndex], m_entities.back());
+                m_entities.pop_back();
 
-                _deletedEntities.push_back(entity);
+                m_deletedEntities.push_back(entity);
 
-                auto &componentsMask = _entitiesComponentsMask[entityIndex];
+                auto &componentsMask = m_entitiesComponentsMask[entityIndex];
 
                 //remove all entity's components from the pools
                 for (std::size_t i = 0, count = componentsMask.size(); i < count; ++i) {
                     std::size_t curComponentIndex = componentsMask[i];
                     if (curComponentIndex != COMPONENT_DOES_NOT_EXIST) {
                         //tricky
-                        _pools[i]->removeComponent(curComponentIndex);
+                        m_pools[i]->removeComponent(curComponentIndex);
                     }
                 }
 
@@ -317,7 +317,7 @@ namespace Giraffe {
 
         std::size_t getEntitiesCount() const {
 
-            return _entities.size();
+            return m_entities.size();
         }
 
         template<typename C>
@@ -330,17 +330,17 @@ namespace Giraffe {
             //has the component kind/family been registered yet?
             if (DerivedComponentsPool<C>::index == COMPONENT_DOES_NOT_EXIST) {
 
-                if (_componentsKindsCount == MAX_COMPONENTS_COUNT) {
+                if (m_componentsKindsCount == MAX_COMPONENTS_COUNT) {
                     throw std::runtime_error(
                             "Maximum number of components exceeded: " + std::to_string(MAX_COMPONENTS_COUNT));
                 }
 
-                DerivedComponentsPool<C>::index = _componentsKindsCount++;
+                DerivedComponentsPool<C>::index = m_componentsKindsCount++;
 
 #if __cplusplus == 201402L // C++14
-                _pools.emplace_back(std::make_unique<DerivedComponentsPool<C> >());
+                m_pools.emplace_back(std::make_unique<DerivedComponentsPool<C> >());
 #else // C++11
-                _pools.emplace_back(make_unique<DerivedComponentsPool<C> >());
+                m_pools.emplace_back(make_unique<DerivedComponentsPool<C> >());
 #endif
             }
         }
@@ -357,7 +357,7 @@ namespace Giraffe {
                 return 0;
             }
 
-            DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(_pools[componentKindIndex].get());
+            DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(m_pools[componentKindIndex].get());
             return poolC->getSize();
         }
 
@@ -377,20 +377,20 @@ namespace Giraffe {
                 registerComponentKind<C>();
                 componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
 
-                for (auto &entityComponentMask: _entitiesComponentsMask) {
+                for (auto &entityComponentMask: m_entitiesComponentsMask) {
                     entityComponentMask.push_back(COMPONENT_DOES_NOT_EXIST);
                 }
             } else {
-                if (_entitiesComponentsMask[entity._index][componentKindIndex] != COMPONENT_DOES_NOT_EXIST) {
+                if (m_entitiesComponentsMask[entity.m_index][componentKindIndex] != COMPONENT_DOES_NOT_EXIST) {
                     //entity already has a component
                     return;
                 }
             }
 
-            DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(_pools[componentKindIndex].get());
+            DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(m_pools[componentKindIndex].get());
             std::size_t componentIndex = poolC->addComponent(std::forward<Args>(args) ...);
-            std::size_t entityIndex = entity._index;
-            _entitiesComponentsMask[entityIndex][componentKindIndex] = componentIndex;
+            std::size_t entityIndex = entity.m_index;
+            m_entitiesComponentsMask[entityIndex][componentKindIndex] = componentIndex;
         }
 
         template<typename C>
@@ -405,8 +405,8 @@ namespace Giraffe {
                 return;
             }
 
-            std::size_t entityIndex = entity._index;
-            auto &entityComponentsMask = _entitiesComponentsMask[entityIndex];
+            std::size_t entityIndex = entity.m_index;
+            auto &entityComponentsMask = m_entitiesComponentsMask[entityIndex];
             std::size_t curComponentIndex = entityComponentsMask[componentKindIndex];
 
             if (curComponentIndex != COMPONENT_DOES_NOT_EXIST) {
@@ -416,7 +416,7 @@ namespace Giraffe {
                 //DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(_pools[componentKindIndex].get());
                 //poolC->removeComponent(curComponentIndex);
 
-                _pools[componentKindIndex]->removeComponent(curComponentIndex);
+                m_pools[componentKindIndex]->removeComponent(curComponentIndex);
             }
         }
 
@@ -428,10 +428,10 @@ namespace Giraffe {
             //
 
             std::size_t componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
-            std::size_t entityIndex = entity._index;
+            std::size_t entityIndex = entity.m_index;
 
             return componentKindIndex != COMPONENT_DOES_NOT_EXIST
-                   && _entitiesComponentsMask[entityIndex][componentKindIndex] != COMPONENT_DOES_NOT_EXIST;
+                   && m_entitiesComponentsMask[entityIndex][componentKindIndex] != COMPONENT_DOES_NOT_EXIST;
         }
 
         template<typename C>
@@ -441,11 +441,11 @@ namespace Giraffe {
 
             if (componentKindIndex != COMPONENT_DOES_NOT_EXIST) {
 
-                std::size_t entityIndex = entity._index;
-                std::size_t componentIndex = _entitiesComponentsMask[entityIndex][componentKindIndex];
+                std::size_t entityIndex = entity.m_index;
+                std::size_t componentIndex = m_entitiesComponentsMask[entityIndex][componentKindIndex];
 
                 if (componentIndex != COMPONENT_DOES_NOT_EXIST) {
-                    DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(_pools[componentKindIndex].get());
+                    DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(m_pools[componentKindIndex].get());
                     return poolC->getComponent(componentIndex);
                 }
 
@@ -464,7 +464,7 @@ namespace Giraffe {
                                                    DerivedComponentsPool<A2>::getKindIndex(),
                                                    DerivedComponentsPool<A3>::getKindIndex(),
                                                    DerivedComponentsPool<Ax>::getKindIndex() ...});
-            return Iterator<PredicateAll>(_entities.begin(), _entities.end(), predicate);
+            return Iterator<PredicateAll>(m_entities.begin(), m_entities.end(), predicate);
         }
 
         //2 parameters
@@ -473,7 +473,7 @@ namespace Giraffe {
 
             PredicateTwo<Entity> predicate(*this, DerivedComponentsPool<A1>::getKindIndex(),
                                            DerivedComponentsPool<A2>::getKindIndex());
-            return Iterator<PredicateTwo>(_entities.begin(), _entities.end(), predicate);
+            return Iterator<PredicateTwo>(m_entities.begin(), m_entities.end(), predicate);
         }
 
         //1 parameter
@@ -481,7 +481,7 @@ namespace Giraffe {
         Iterator<PredicateOne> begin() {
 
             PredicateOne<Entity> predicate(*this, DerivedComponentsPool<A>::getKindIndex());
-            return Iterator<PredicateOne>(_entities.begin(), _entities.end(), predicate);
+            return Iterator<PredicateOne>(m_entities.begin(), m_entities.end(), predicate);
         }
 
         //3 or more parameters
@@ -492,7 +492,7 @@ namespace Giraffe {
                                                    DerivedComponentsPool<A2>::getKindIndex(),
                                                    DerivedComponentsPool<A3>::getKindIndex(),
                                                    DerivedComponentsPool<Ax>::getKindIndex() ...});
-            return Iterator<PredicateAll>(_entities.end(), _entities.end(), predicate);
+            return Iterator<PredicateAll>(m_entities.end(), m_entities.end(), predicate);
         }
 
         //2 parameters
@@ -501,7 +501,7 @@ namespace Giraffe {
 
             PredicateTwo<Entity> predicate(*this, DerivedComponentsPool<A1>::getKindIndex(),
                                            DerivedComponentsPool<A2>::getKindIndex());
-            return Iterator<PredicateTwo>(_entities.end(), _entities.end(), predicate);
+            return Iterator<PredicateTwo>(m_entities.end(), m_entities.end(), predicate);
         }
 
         //1 parameter
@@ -509,7 +509,7 @@ namespace Giraffe {
         Iterator<PredicateOne> end() {
 
             PredicateOne<Entity> predicate(*this, DerivedComponentsPool<A>::getKindIndex());
-            return Iterator<PredicateOne>(_entities.end(), _entities.end(), predicate);
+            return Iterator<PredicateOne>(m_entities.end(), m_entities.end(), predicate);
         }
 
         //3 or more parameters
@@ -521,9 +521,8 @@ namespace Giraffe {
                                                    DerivedComponentsPool<A3>::getKindIndex(),
                                                    DerivedComponentsPool<Ax>::getKindIndex() ...});
 
-            for (Iterator<PredicateAll> iterBegin = Iterator<PredicateAll>(_entities.begin(), _entities.end(),
-                                                                           predicate),
-                         iterEnd = Iterator<PredicateAll>(_entities.end(), _entities.end(), predicate);
+            for (Iterator<PredicateAll> iterBegin = Iterator<PredicateAll>(m_entities.begin(), m_entities.end(), predicate),
+                         iterEnd = Iterator<PredicateAll>(m_entities.end(), m_entities.end(), predicate);
                  iterBegin != iterEnd;
                  ++iterBegin) {
                 const Giraffe::Entity &entity = *iterBegin;
@@ -538,9 +537,9 @@ namespace Giraffe {
             PredicateTwo<Entity> predicate(*this, DerivedComponentsPool<A1>::getKindIndex(),
                                            DerivedComponentsPool<A2>::getKindIndex());
 
-            for (Iterator<PredicateTwo> iterBegin = Iterator<PredicateTwo>(_entities.begin(), _entities.end(),
+            for (Iterator<PredicateTwo> iterBegin = Iterator<PredicateTwo>(m_entities.begin(), m_entities.end(),
                                                                            predicate),
-                         iterEnd = Iterator<PredicateTwo>(_entities.end(), _entities.end(), predicate);
+                         iterEnd = Iterator<PredicateTwo>(m_entities.end(), m_entities.end(), predicate);
                  iterBegin != iterEnd;
                  ++iterBegin) {
                 const Giraffe::Entity &entity = *iterBegin;
@@ -554,9 +553,9 @@ namespace Giraffe {
 
             PredicateOne<Entity> predicate(*this, DerivedComponentsPool<A>::getKindIndex());
 
-            for (Iterator<PredicateOne> iterBegin = Iterator<PredicateOne>(_entities.begin(), _entities.end(),
+            for (Iterator<PredicateOne> iterBegin = Iterator<PredicateOne>(m_entities.begin(), m_entities.end(),
                                                                            predicate),
-                         iterEnd = Iterator<PredicateOne>(_entities.end(), _entities.end(), predicate);
+                         iterEnd = Iterator<PredicateOne>(m_entities.end(), m_entities.end(), predicate);
                  iterBegin != iterEnd;
                  ++iterBegin) {
                 const Giraffe::Entity &entity = *iterBegin;
@@ -586,8 +585,8 @@ namespace Giraffe {
                                                    DerivedComponentsPool<Ax>::getKindIndex() ...});
 
             return Result<Iterator<PredicateAll>>(
-                    Iterator<PredicateAll>(_entities.begin(), _entities.end(), predicate),
-                    Iterator<PredicateAll>(_entities.end(), _entities.end(), predicate)
+                    Iterator<PredicateAll>(m_entities.begin(), m_entities.end(), predicate),
+                    Iterator<PredicateAll>(m_entities.end(), m_entities.end(), predicate)
             );
         }
 
@@ -599,8 +598,8 @@ namespace Giraffe {
                                            DerivedComponentsPool<A2>::getKindIndex());
 
             return Result<Iterator<PredicateTwo>>(
-                    Iterator<PredicateTwo>(_entities.begin(), _entities.end(), predicate),
-                    Iterator<PredicateTwo>(_entities.end(), _entities.end(), predicate)
+                    Iterator<PredicateTwo>(m_entities.begin(), m_entities.end(), predicate),
+                    Iterator<PredicateTwo>(m_entities.end(), m_entities.end(), predicate)
             );
         }
 
@@ -611,25 +610,25 @@ namespace Giraffe {
             PredicateOne<Entity> predicate(*this, DerivedComponentsPool<A>::getKindIndex());
 
             return Result<Iterator<PredicateOne>>(
-                    Iterator<PredicateOne>(_entities.begin(), _entities.end(), predicate),
-                    Iterator<PredicateOne>(_entities.end(), _entities.end(), predicate)
+                    Iterator<PredicateOne>(m_entities.begin(), m_entities.end(), predicate),
+                    Iterator<PredicateOne>(m_entities.end(), m_entities.end(), predicate)
             );
         }
 
         //methods for retrieving *all* entities
         Entities_Container_t::iterator begin() {
 
-            return _entities.begin();
+            return m_entities.begin();
         }
 
         Entities_Container_t::iterator end() {
 
-            return _entities.end();
+            return m_entities.end();
         }
 
         void process(std::function<void(const Entity &entity)> func) {
 
-            for (auto iterBegin = _entities.begin(), iterEnd = _entities.end();
+            for (auto iterBegin = m_entities.begin(), iterEnd = m_entities.end();
                  iterBegin != iterEnd;
                  ++iterBegin) {
                 Giraffe::Entity &entity = *iterBegin;
@@ -640,19 +639,19 @@ namespace Giraffe {
         Result<Entities_Container_t::iterator> range() {
 
             return Result<Entities_Container_t::iterator>(
-                    Entities_Container_t::iterator(_entities.begin()),
-                    Entities_Container_t::iterator(_entities.end())
+                    Entities_Container_t::iterator(m_entities.begin()),
+                    Entities_Container_t::iterator(m_entities.end())
             );
         }
 
     private:
 
-        std::vector<std::vector<std::size_t> > _entitiesComponentsMask; //entity id -> components mask
-        Entities_Container_t _entities;
-        std::size_t _componentsKindsCount;
-        std::deque<Entity> _deletedEntities;
+        std::vector<std::vector<std::size_t> > m_entitiesComponentsMask; //entity id -> components mask
+        Entities_Container_t m_entities;
+        std::size_t m_componentsKindsCount;
+        std::deque<Entity> m_deletedEntities;
 
-        std::vector<std::unique_ptr<ComponentsPool>> _pools;
+        std::vector<std::unique_ptr<ComponentsPool>> m_pools;
     };
 
     class System {
@@ -669,22 +668,22 @@ namespace Giraffe {
 
     template<typename C, typename ... Args>
     void Entity::addComponent(Args &&... args) {
-        _storage->addComponent<C>(*this, std::forward<Args>(args) ...);
+        m_storage->addComponent<C>(*this, std::forward<Args>(args) ...);
     }
 
     template<typename C>
     void Entity::removeComponent() {
-        _storage->removeComponent<C>(*this);
+        m_storage->removeComponent<C>(*this);
     }
 
     template<typename C>
     C *Entity::getComponent() const {
-        return _storage->getComponent<C>(*this);
+        return m_storage->getComponent<C>(*this);
     }
 
     template<typename C>
     bool Entity::hasComponent() const {
-        return _storage->hasComponent<C>(*this);
+        return m_storage->hasComponent<C>(*this);
     }
 }
 
