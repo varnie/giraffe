@@ -315,6 +315,11 @@ namespace Giraffe {
             }
         }
 
+        std::size_t getEntitiesCount() const {
+
+            return _entities.size();
+        }
+
         template<typename C>
         void registerComponentKind() {
 
