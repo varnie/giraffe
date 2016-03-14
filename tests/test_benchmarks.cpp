@@ -11,31 +11,31 @@
 class Timer {
 public:
     Timer() {
-        _start = std::chrono::system_clock::now();
+        m_start = std::chrono::system_clock::now();
     }
 
     ~Timer() { }
 
     void restart() {
-        _start = std::chrono::system_clock::now();
+        m_start = std::chrono::system_clock::now();
     }
 
     double elapsed() {
-        return std::chrono::duration<double>(std::chrono::system_clock::now() - _start).count();
+        return std::chrono::duration<double>(std::chrono::system_clock::now() - m_start).count();
     }
 
 private:
-    std::chrono::time_point<std::chrono::system_clock> _start;
+    std::chrono::time_point<std::chrono::system_clock> m_start;
 };
 
 struct AutoTimer {
 public:
     ~AutoTimer() {
-        std::cout << timer_.elapsed() << " seconds elapsed" << std::endl;
+        std::cout << m_timer.elapsed() << " seconds elapsed" << std::endl;
     }
 
 private:
-    Timer timer_;
+    Timer m_timer;
 };
 
 TEST(StorageTest, TestCreateEntities) {

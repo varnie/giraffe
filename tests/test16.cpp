@@ -10,33 +10,33 @@
 TEST(StorageTest, ComponentsDestructorsInvocation1) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result) : Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
+        Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
 
-        Foo(const Foo &other) : _pInt(new int(*other._pInt)), _result(other._result) {
+        Foo(const Foo &other) : m_pInt(new int(*other.m_pInt)), m_result(other.m_result) {
 
             std::cout << "Foo copy-ctor" << std::endl;
         }
 
         Foo &operator=(const Foo &other) {
             std::cout << "Foo copy assign" << std::endl;
-            delete _pInt;
-            _pInt = new int(*other._pInt);
-            _result = other._result;
+            delete m_pInt;
+            m_pInt = new int(*other.m_pInt);
+            m_result = other.m_result;
             return *this;
         }
 
     public:
         ~Foo() {
-            delete _pInt;
+            delete m_pInt;
             std::cout << "Foo ~dtor" << std::endl;
-            _result++;
+            m_result++;
         }
 
-        int *_pInt;
-        int &_result;
+        int *m_pInt;
+        int &m_result;
     };
 
     int result = 0;
@@ -53,33 +53,33 @@ TEST(StorageTest, ComponentsDestructorsInvocation1) {
 TEST(StorageTest, ComponentsDestructorsInvocation2) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result) : Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
+        Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
 
-        Foo(const Foo &other) : _pInt(new int(*other._pInt)), _result(other._result) {
+        Foo(const Foo &other) : m_pInt(new int(*other.m_pInt)), m_result(other.m_result) {
 
             std::cout << "Foo copy-ctor" << std::endl;
         }
 
         Foo &operator=(const Foo &other) {
             std::cout << "Foo copy assign" << std::endl;
-            delete _pInt;
-            _pInt = new int(*other._pInt);
-            _result = other._result;
+            delete m_pInt;
+            m_pInt = new int(*other.m_pInt);
+            m_result = other.m_result;
             return *this;
         }
 
     public:
         ~Foo() {
-            delete _pInt;
+            delete m_pInt;
             std::cout << "Foo ~dtor" << std::endl;
-            _result++;
+            m_result++;
         }
 
-        int *_pInt;
-        int &_result;
+        int *m_pInt;
+        int &m_result;
     };
 
     int result = 0;
@@ -96,33 +96,33 @@ TEST(StorageTest, ComponentsDestructorsInvocation2) {
 TEST(StorageTest, ComponentsDestructorsInvocation3) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result) : Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
+        Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
 
-        Foo(const Foo &other) : _pInt(new int(*other._pInt)), _result(other._result) {
+        Foo(const Foo &other) : m_pInt(new int(*other.m_pInt)), m_result(other.m_result) {
 
             std::cout << "Foo copy-ctor" << std::endl;
         }
 
         Foo &operator=(const Foo &other) {
             std::cout << "Foo copy assign" << std::endl;
-            delete _pInt;
-            _pInt = new int(*other._pInt);
-            _result = other._result;
+            delete m_pInt;
+            m_pInt = new int(*other.m_pInt);
+            m_result = other.m_result;
             return *this;
         }
 
     public:
         ~Foo() {
-            delete _pInt;
+            delete m_pInt;
             std::cout << "Foo ~dtor" << std::endl;
-            _result++;
+            m_result++;
         }
 
-        int *_pInt;
-        int &_result;
+        int *m_pInt;
+        int &m_result;
     };
 
     int result = 0;
@@ -141,33 +141,33 @@ TEST(StorageTest, ComponentsDestructorsInvocation3) {
 TEST(StorageTest, ComponentsDestructorsInvocation4) {
 
     struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result) : Giraffe::Component<Foo>(), _pInt(new int(29)), _result(result) {
+        Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
 
             std::cout << "Foo ctor" << std::endl;
         }
 
-        Foo(const Foo &other) : _pInt(new int(*other._pInt)), _result(other._result) {
+        Foo(const Foo &other) : m_pInt(new int(*other.m_pInt)), m_result(other.m_result) {
 
             std::cout << "Foo copy-ctor" << std::endl;
         }
 
         Foo &operator=(const Foo &other) {
             std::cout << "Foo copy assign" << std::endl;
-            delete _pInt;
-            _pInt = new int(*other._pInt);
-            _result = other._result;
+            delete m_pInt;
+            m_pInt = new int(*other.m_pInt);
+            m_result = other.m_result;
             return *this;
         }
 
     public:
         ~Foo() {
-            delete _pInt;
+            delete m_pInt;
             std::cout << "Foo ~dtor" << std::endl;
-            _result++;
+            m_result++;
         }
 
-        int *_pInt;
-        int &_result;
+        int *m_pInt;
+        int &m_result;
     };
 
     int result = 0;

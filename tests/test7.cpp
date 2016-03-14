@@ -12,21 +12,21 @@ TEST(StorageTest, EntityRemoveComponent) {
     };
 
     class FooSystem : public Giraffe::System {
-        std::size_t found;
+        std::size_t m_found;
     public:
-        FooSystem(Giraffe::Storage &storage) : Giraffe::System(storage), found(0) { }
+        FooSystem(Giraffe::Storage &storage) : Giraffe::System(storage), m_found(0) { }
 
         virtual void update(float f) {
-            found = 0;
+            m_found = 0;
             _storage.process<Foo>([&](const Giraffe::Entity &entity) {
                 Foo *pFoo = _storage.getComponent<Foo>(entity);
                 (void) pFoo;
-                ++found;
+                ++m_found;
             });
         }
 
         std::size_t getFound() const {
-            return found;
+            return m_found;
         }
     };
 

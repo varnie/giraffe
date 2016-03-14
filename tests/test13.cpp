@@ -16,9 +16,9 @@ TEST(StorageTest, SearchThreeRegisteredComponents) {
     };
 
     struct Fred : public Giraffe::Component<Fred> {
-        int i;
+        int m_i;
 
-        Fred(int i) : Giraffe::Component<Fred>(), i(i) { }
+        Fred(int i) : Giraffe::Component<Fred>(), m_i(i) { }
     };
 
     Giraffe::Storage storage;
@@ -42,7 +42,7 @@ TEST(StorageTest, SearchThreeRegisteredComponents) {
     for (const Giraffe::Entity &e: storage.range<Foo, Bar, Fred>()) {
         ++result;
         Fred *pFred = e.getComponent<Fred>();
-        fredICount += pFred->i;
+        fredICount += pFred->m_i;
     }
 
     EXPECT_EQ(result, 20);
