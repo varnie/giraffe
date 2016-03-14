@@ -178,6 +178,53 @@ TEST(StorageTest, TestEntityIterationUnpackThree) {
     ASSERT_TRUE(true);
 }
 
+TEST(StorageTest, TestEntityIterationHacky) {
+
+    struct Position : public Giraffe::Component<Position> {
+        Position() : Giraffe::Component<Position>() { }
+    };
+
+    struct Duration : public Giraffe::Component<Duration> {
+        Duration() : Giraffe::Component<Duration>() { }
+    };
+
+    struct Weight : public Giraffe::Component<Weight> {
+        Weight() : Giraffe::Component<Weight>() { }
+    };
+
+    Giraffe::Storage storage;
+
+    std::vector<Giraffe::Entity> entities;
+    int count = 10000000;
+    for (int i = 0; i < count; i++) {
+        auto e = storage.addEntity();
+        entities.push_back(e);
+
+        e.addComponent<Position>();
+        e.addComponent<Duration>();
+        e.addComponent<Weight>();
+    }
+
+    AutoTimer t;
+    std::cout << "iterating over " << count << " entities, unpacking three components (hacky version)" << std::endl;
+
+    for (const Giraffe::Entity &e: entities) {
+        auto *pPosition = e.getComponent<Position>();
+        (void) pPosition;
+        ASSERT_TRUE(pPosition != nullptr);
+
+        auto *pDuration = e.getComponent<Duration>();
+        (void) pDuration;
+        ASSERT_TRUE(pDuration != nullptr);
+
+        auto *pWeight = e.getComponent<Weight>();
+        (void) pWeight;
+        ASSERT_TRUE(pWeight != nullptr);
+    }
+
+    ASSERT_TRUE(true);
+}
+
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

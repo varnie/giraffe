@@ -1,0 +1,32 @@
+[==========] Running 6 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 6 tests from StorageTest
+[ RUN      ] StorageTest.TestCreateEntities
+creating 10000000 entities
+0.405489 seconds elapsed
+[       OK ] StorageTest.TestCreateEntities (452 ms)
+[ RUN      ] StorageTest.TestDestroyEntities
+destroying 10000000 entities
+0.0927191 seconds elapsed
+[       OK ] StorageTest.TestDestroyEntities (663 ms)
+[ RUN      ] StorageTest.TestEntityIteration
+iterating over 10000000 entities, unpacking one component
+0.0718761 seconds elapsed
+[       OK ] StorageTest.TestEntityIteration (1055 ms)
+[ RUN      ] StorageTest.TestEntityIterationUnpackTwo
+iterating over 10000000 entities, unpacking two components
+0.114467 seconds elapsed
+[       OK ] StorageTest.TestEntityIterationUnpackTwo (1163 ms)
+[ RUN      ] StorageTest.TestEntityIterationUnpackThree
+iterating over 10000000 entities, unpacking three components
+0.213101 seconds elapsed
+[       OK ] StorageTest.TestEntityIterationUnpackThree (1318 ms)
+[ RUN      ] StorageTest.TestEntityIterationHacky
+iterating over 10000000 entities, unpacking three components (hacky version)
+0.139189 seconds elapsed
+[       OK ] StorageTest.TestEntityIterationHacky (1358 ms)
+[----------] 6 tests from StorageTest (6298 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test case ran. (6454 ms total)
+[  PASSED  ] 6 tests.
