@@ -184,6 +184,52 @@ TEST(StorageTest, ComponentsDestructorsInvocation4) {
     ASSERT_EQ(result, 2);
 }
 
+TEST(StorageTest, ComponentsDestructorsInvocation5) {
+
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
+
+            std::cout << "Foo ctor" << std::endl;
+        }
+
+        Foo(const Foo &other) : m_pInt(new int(*other.m_pInt)), m_result(other.m_result) {
+
+            std::cout << "Foo copy-ctor" << std::endl;
+        }
+
+        Foo &operator=(const Foo &other) {
+            std::cout << "Foo copy assign" << std::endl;
+            delete m_pInt;
+            m_pInt = new int(*other.m_pInt);
+            m_result = other.m_result;
+            return *this;
+        }
+
+    public:
+        ~Foo() {
+            delete m_pInt;
+            std::cout << "Foo ~dtor" << std::endl;
+            m_result++;
+        }
+
+        int *m_pInt;
+        int &m_result;
+    };
+
+    int result = 0;
+
+    Giraffe::Storage storage;
+    storage.registerComponentKind<Foo>();
+
+    for (int i = 0; i < 5; ++i) {
+        Giraffe::Entity eX = storage.addEntity();
+        eX.addComponent<Foo>(result);
+        storage.removeEntity(eX);
+    }
+
+    ASSERT_EQ(result, 5);
+}
+
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
