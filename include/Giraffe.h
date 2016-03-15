@@ -293,6 +293,7 @@ namespace Giraffe {
         void removeEntity(const Entity &entity) {
 
             std::size_t entityIndex = entity.m_index;
+            //TODO: reimplement the removal logics. it is buggy ATM.
             if (entityIndex < m_entities.size()) {
                 std::swap(m_entities[entityIndex], m_entities.back());
                 m_entities.pop_back();
