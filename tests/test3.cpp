@@ -19,7 +19,7 @@ TEST(StorageTest, GetRegisteredComponentFromEntity) {
     e.addComponent<Foo>();
     bool ok;
     try {
-        auto *pComp = storage.getComponent<Foo>(e);
+        auto *pComp = e.getComponent<Foo>();;
         ok = true;
     } catch (const std::runtime_error &exc) {
         ok = false;

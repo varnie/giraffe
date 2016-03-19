@@ -44,8 +44,8 @@ namespace Giraffe {
     class Storage;
 
     struct Entity {
-        Entity(std::size_t index, Storage &storage)
-                : m_index(index), m_storage(&storage) { }
+        Entity(std::size_t index, std::size_t version, Storage &storage)
+                : m_index(index), m_version(version), m_storage(&storage) { }
 
         template<typename C, typename ... Args>
         void addComponent(Args &&... args);
@@ -59,7 +59,10 @@ namespace Giraffe {
         template<typename C>
         bool hasComponent() const;
 
+        bool isValid() const;
+
         std::size_t m_index;
+        std::size_t m_version;
         Storage *m_storage;
     };
 
@@ -212,10 +215,9 @@ namespace Giraffe {
 
             bool operator()(const T &e) const {
 
-                std::size_t entityIndex = e.m_index;
-                const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[entityIndex];
+                const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[e.m_index];
 
-                return std::all_of(m_conditions.cbegin(), m_conditions.cend(),
+                return e.isValid() && std::all_of(m_conditions.cbegin(), m_conditions.cend(),
                                    [&entityComponentsMask](const std::size_t cond) {
                                        return entityComponentsMask[cond] != COMPONENT_DOES_NOT_EXIST;
                                    });
@@ -234,10 +236,9 @@ namespace Giraffe {
 
             bool operator()(const T &e) const {
 
-                std::size_t entityIndex = e.m_index;
-                const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[entityIndex];
+                const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[e.m_index];
 
-                return entityComponentsMask[m_cond1] != COMPONENT_DOES_NOT_EXIST &&
+                return e.isValid() && entityComponentsMask[m_cond1] != COMPONENT_DOES_NOT_EXIST &&
                        entityComponentsMask[m_cond2] != COMPONENT_DOES_NOT_EXIST;
             }
 
@@ -254,15 +255,25 @@ namespace Giraffe {
 
             bool operator()(const T &e) const {
 
-                std::size_t entityIndex = e.m_index;
-                const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[entityIndex];
+                const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[e.m_index];
 
-                return entityComponentsMask[m_condition] != COMPONENT_DOES_NOT_EXIST;
+                return e.isValid() && entityComponentsMask[m_condition] != COMPONENT_DOES_NOT_EXIST;
             }
 
         private:
             const Storage &m_storage;
             std::size_t m_condition;
+        };
+
+        template<typename T>
+        class PredicateDummy {
+        public:
+            PredicateDummy() { }
+
+            bool operator()(const T &e) const {
+
+                return e.isValid();
+            }
         };
         //predicate
 
@@ -272,17 +283,24 @@ namespace Giraffe {
         template<template<class Item> class Predicate>
         using Iterator = FilterIterator<Entities_Iterator_t, Predicate<Entity> >;
 
-        Storage() : m_entitiesComponentsMask(), m_entities(), m_componentsKindsCount(0), m_deletedEntities(), m_pools() { }
+        Storage() : m_entitiesComponentsMask(), m_entities(), m_componentsKindsCount(0), m_deletedEntities(), m_entitiesVersions(),  m_pools() { }
+
+        bool isValid(const Entity &entity) const {
+
+            return entity.m_index < m_entitiesVersions.size() && m_entitiesVersions[entity.m_index] == entity.m_version;
+        }
 
         Entity addEntity() {
 
             if (!m_deletedEntities.empty()) {
                 Entity entity = m_deletedEntities.back();
                 m_deletedEntities.pop_back();
+                ++entity.m_version;
                 m_entities.push_back(entity);
             } else {
                 std::size_t curEntityIndex = m_entities.size();
-                m_entities.push_back(Entity(curEntityIndex, *this));
+                m_entities.push_back(Entity(curEntityIndex, 0, *this));
+                m_entitiesVersions.push_back(0);
                 m_entitiesComponentsMask.push_back(
                         std::vector<std::size_t>(m_componentsKindsCount, COMPONENT_DOES_NOT_EXIST));
             }
@@ -292,28 +310,25 @@ namespace Giraffe {
 
         void removeEntity(const Entity &entity) {
 
+            assert(entity.isValid() && "invalid entity");
+
             std::size_t entityIndex = entity.m_index;
-            //TODO: reimplement the removal logics. it is buggy ATM.
-            if (entityIndex < m_entities.size()) {
-                std::swap(m_entities[entityIndex], m_entities.back());
-                m_entities.pop_back();
+            m_deletedEntities.push_back(entity);
+            ++m_entitiesVersions[entityIndex];
 
-                m_deletedEntities.push_back(entity);
+            auto &componentsMask = m_entitiesComponentsMask[entityIndex];
 
-                auto &componentsMask = m_entitiesComponentsMask[entityIndex];
-
-                //remove all entity's components from the pools
-                for (std::size_t i = 0, count = componentsMask.size(); i < count; ++i) {
-                    std::size_t curComponentIndex = componentsMask[i];
-                    if (curComponentIndex != COMPONENT_DOES_NOT_EXIST) {
-                        //tricky
-                        m_pools[i]->removeComponent(curComponentIndex);
-                    }
+            //remove all entity's components from the pools
+            for (std::size_t i = 0, count = componentsMask.size(); i < count; ++i) {
+                std::size_t curComponentIndex = componentsMask[i];
+                if (curComponentIndex != COMPONENT_DOES_NOT_EXIST) {
+                    //tricky
+                    m_pools[i]->removeComponent(curComponentIndex);
                 }
-
-                //reset the mask
-                componentsMask.assign(componentsMask.size(), COMPONENT_DOES_NOT_EXIST);
             }
+
+            //reset the mask
+            componentsMask.assign(componentsMask.size(), COMPONENT_DOES_NOT_EXIST);
         }
 
         std::size_t getEntitiesCount() const {
@@ -362,10 +377,10 @@ namespace Giraffe {
             return poolC->getSize();
         }
 
-        //TODO: check that recreation of component on an entity which was deleted, works
-        //ie: oldEntity.addComponent<Foo>(); storage.removeEntity(oldEntity); newEntity = storage.addEntity(); newEntity.addComponent<Foo>() puts a newly allocated component instead of an older one
         template<typename C, typename ... Args>
         void addComponent(const Entity &entity, Args &&... args) {
+
+            assert(entity.isValid() && "invalid entity");
 
             //
             static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
@@ -397,6 +412,8 @@ namespace Giraffe {
         template<typename C>
         void removeComponent(const Entity &entity) {
 
+            assert(entity.isValid() && "invalid entity");
+
             //
             static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
             //
@@ -424,6 +441,8 @@ namespace Giraffe {
         template<typename C>
         bool hasComponent(const Entity &entity) const {
 
+            assert(entity.isValid() && "invalid entity");
+
             //
             static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
             //
@@ -437,6 +456,8 @@ namespace Giraffe {
 
         template<typename C>
         C *getComponent(const Entity &entity) const {
+
+            assert(entity.isValid() && "invalid entity");
 
             std::size_t componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
 
@@ -616,32 +637,23 @@ namespace Giraffe {
             );
         }
 
-        //methods for retrieving *all* entities
-        Entities_Container_t::iterator begin() {
-
-            return m_entities.begin();
-        }
-
-        Entities_Container_t::iterator end() {
-
-            return m_entities.end();
-        }
-
         void process(std::function<void(const Entity &entity)> func) {
 
             for (auto iterBegin = m_entities.begin(), iterEnd = m_entities.end();
                  iterBegin != iterEnd;
                  ++iterBegin) {
-                Giraffe::Entity &entity = *iterBegin;
-                func(entity);
+                const Giraffe::Entity &entity = *iterBegin;
+                if (entity.isValid()) {
+                    func(entity);
+                }
             }
         }
 
-        Result<Entities_Container_t::iterator> range() {
+        Result<Iterator<PredicateDummy>> range() {
 
-            return Result<Entities_Container_t::iterator>(
-                    Entities_Container_t::iterator(m_entities.begin()),
-                    Entities_Container_t::iterator(m_entities.end())
+            return Result<Iterator<PredicateDummy>>(
+                    Iterator<PredicateDummy>(m_entities.begin(), m_entities.end(), PredicateDummy<Entity>()),
+                    Iterator<PredicateDummy>(m_entities.end(), m_entities.end(), PredicateDummy<Entity>())
             );
         }
 
@@ -650,7 +662,8 @@ namespace Giraffe {
         std::vector<std::vector<std::size_t> > m_entitiesComponentsMask; //entity id -> components mask
         Entities_Container_t m_entities;
         std::size_t m_componentsKindsCount;
-        std::deque<Entity> m_deletedEntities;
+        std::vector<Entity> m_deletedEntities;
+        std::vector<std::size_t> m_entitiesVersions;
 
         std::vector<std::unique_ptr<ComponentsPool>> m_pools;
     };
@@ -666,6 +679,10 @@ namespace Giraffe {
     protected:
         Storage &_storage;
     };
+
+    bool Entity::isValid() const {
+        return m_storage->isValid(*this);
+    }
 
     template<typename C, typename ... Args>
     void Entity::addComponent(Args &&... args) {

@@ -17,26 +17,19 @@ TEST(StorageTest, CheckRetrievingAllEntities) {
         Giraffe::Entity e = storage.addEntity();
     }
 
-    std::size_t count1 = 0, count2 = 0, count3 = 0;
-    for (auto iter = storage.begin(), iterEnd = storage.end();
-        iter != iterEnd;
-        ++iter) {
+    std::size_t count1 = 0, count2 = 0;
+
+    for (const auto &entity: storage.range()) {
         ++count1;
     }
 
     EXPECT_EQ(count1, 5);
 
-    for (const auto &entity: storage.range()) {
-        ++count2;
-    }
-
-    EXPECT_EQ(count2, 5);
-
     storage.process([&](const Giraffe::Entity &entity) {
-        ++count3;
+        ++count2;
     });
 
-    EXPECT_EQ(count3, 5);
+    EXPECT_EQ(count2, 5);
 }
 
 int main(int argc, char **argv) {

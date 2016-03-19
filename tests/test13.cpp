@@ -27,7 +27,8 @@ TEST(StorageTest, SearchThreeRegisteredComponents) {
     storage.registerComponentKind<Fred>();
 
     int iMustBe = 0;
-    for (int i = 0; i < 20; ++i) {
+    int count = 20;
+    for (int i = 0; i < count; ++i) {
         Giraffe::Entity e1 = storage.addEntity();
         e1.addComponent<Foo>();
         e1.addComponent<Bar>();
@@ -39,13 +40,13 @@ TEST(StorageTest, SearchThreeRegisteredComponents) {
     std::size_t result = 0;
     std::size_t fredICount = 0;
 
-    for (const Giraffe::Entity &e: storage.range<Foo, Bar, Fred>()) {
+    for (const auto &e: storage.range<Foo, Bar, Fred>()) {
         ++result;
         Fred *pFred = e.getComponent<Fred>();
         fredICount += pFred->m_i;
     }
 
-    EXPECT_EQ(result, 20);
+    EXPECT_EQ(result, count);
     EXPECT_EQ(fredICount, iMustBe);
 }
 

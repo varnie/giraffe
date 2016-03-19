@@ -58,16 +58,15 @@ TEST(StorageTest, TestDestroyEntities) {
     Giraffe::Storage storage;
 
     std::uint64_t count = 10000000L;
-    std::vector<Giraffe::Entity> entities;
     for (std::uint64_t i = 0; i < count; i++) {
-        entities.push_back(storage.addEntity());
+        storage.addEntity();
     }
 
     AutoTimer t;
     std::cout << "destroying " << count << " entities" << std::endl;
 
-    for (auto e : entities) {
-        storage.removeEntity(e);
+    for (const auto &entity : storage.range()) {
+        storage.removeEntity(entity);
     }
 
     ASSERT_TRUE(true);

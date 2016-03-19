@@ -30,6 +30,36 @@ TEST(StorageTest, RemoveRestoreEntityHavingComponents) {
     EXPECT_EQ(result, 0);
 }
 
+TEST(StorageTest, RemoveAndAndNewEntityWithComponents) {
+
+    struct Foo : public Giraffe::Component<Foo> {
+        Foo(int i) : Giraffe::Component<Foo>(), m_i(i) { }
+        int getI() const {
+            return m_i;
+        }
+        int m_i;
+    };
+
+    Giraffe::Storage storage;
+    storage.registerComponentKind<Foo>();
+
+    Giraffe::Entity e1 = storage.addEntity();
+    e1.addComponent<Foo>(42);
+    storage.removeEntity(e1);
+
+    Giraffe::Entity e2 = storage.addEntity();
+    e2.addComponent<Foo>(43);
+
+    std::size_t count = 0;
+    for (const auto &e : storage.range<Foo>()) {
+        ASSERT_TRUE(e.hasComponent<Foo>());
+        ASSERT_TRUE(e.getComponent<Foo>() != nullptr);
+        ASSERT_EQ(e.getComponent<Foo>()->getI(), 43);
+        ++count;
+    }
+
+    EXPECT_EQ(count, 1);
+}
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);

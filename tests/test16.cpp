@@ -6,7 +6,6 @@
 #include <iostream>
 #include "../include/Giraffe.h"
 
-//TODO:
 TEST(StorageTest, ComponentsDestructorsInvocation1) {
 
     struct Foo : public Giraffe::Component<Foo> {
@@ -28,7 +27,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation1) {
             return *this;
         }
 
-    public:
         ~Foo() {
             delete m_pInt;
             std::cout << "Foo ~dtor" << std::endl;
@@ -71,7 +69,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation2) {
             return *this;
         }
 
-    public:
         ~Foo() {
             delete m_pInt;
             std::cout << "Foo ~dtor" << std::endl;
@@ -159,7 +156,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation4) {
             return *this;
         }
 
-    public:
         ~Foo() {
             delete m_pInt;
             std::cout << "Foo ~dtor" << std::endl;
@@ -205,7 +201,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation5) {
             return *this;
         }
 
-    public:
         ~Foo() {
             delete m_pInt;
             std::cout << "Foo ~dtor" << std::endl;

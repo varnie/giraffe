@@ -34,18 +34,15 @@ TEST(StorageTest, EntityRemoveRecreateComponent) {
     storage.registerComponentKind<Foo>();
 
     std::size_t poolSize1 = storage.getPoolSize<Foo>();
-
     Giraffe::Entity e1 = storage.addEntity();
     e1.addComponent<Foo>();
     e1.removeComponent<Foo>();
 
     std::size_t poolSize2 = storage.getPoolSize<Foo>();
-
     Giraffe::Entity e2 = storage.addEntity();
     e2.addComponent<Foo>();
 
     std::size_t poolSize3 = storage.getPoolSize<Foo>();
-
     FooSystem system = FooSystem(storage);
     system.update(1.0f);
 

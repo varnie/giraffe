@@ -43,9 +43,8 @@ TEST(StorageTest, EntityHasComponents) {
 
     //now remove entity
     storage.removeEntity(e1);
-    EXPECT_EQ(e1.hasComponent<Foo>(), false);
-    EXPECT_EQ(e1.hasComponent<Bar>(), false);
-    EXPECT_EQ(e1.hasComponent<Fred>(), false);
+
+    EXPECT_EQ(e1.isValid(), false);
 }
 
 int main(int argc, char **argv) {
