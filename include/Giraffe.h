@@ -277,7 +277,7 @@ namespace Giraffe {
         };
         //predicate
 
-        using Entities_Container_t = std::deque<Entity>;
+        using Entities_Container_t = std::vector<Entity>;
         using Entities_Iterator_t = Entities_Container_t::const_iterator;
 
         template<template<class Item> class Predicate>
@@ -662,7 +662,7 @@ namespace Giraffe {
         std::vector<std::vector<std::size_t> > m_entitiesComponentsMask; //entity id -> components mask
         Entities_Container_t m_entities;
         std::size_t m_componentsKindsCount;
-        std::vector<Entity> m_deletedEntities;
+        std::deque<Entity> m_deletedEntities;
         std::vector<std::size_t> m_entitiesVersions;
 
         std::vector<std::unique_ptr<ComponentsPool>> m_pools;
