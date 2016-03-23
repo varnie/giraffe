@@ -2,7 +2,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 cmake_minimum_required(VERSION 2.8)
 
-set(PROJECT_NAME ecs)
+set(PROJECT_NAME giraffe)
 project(${PROJECT_NAME})
 
 add_subdirectory(src)
