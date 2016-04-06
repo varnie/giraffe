@@ -16,13 +16,13 @@ namespace Giraffe {
     template<typename T, typename Storage>
     class PredicateAll {
     public:
-        PredicateAll(const Storage &storage, const std::initializer_list<std::size_t> &conditions)
+        PredicateAll(const Storage &storage, const std::initializer_list<std::size_t> & conditions)
                 : m_storage(storage), m_conditions(conditions) { }
 
         bool operator()(const T &e) const {
 
             const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[e.m_index];
-            return e.isValid() && std::all_of(m_conditions.cbegin(), m_conditions.cend(),
+            return m_storage.isValid(e) && std::all_of(m_conditions.cbegin(), m_conditions.cend(),
                                               [&entityComponentsMask](const std::size_t cond) {
                                                   return entityComponentsMask[cond] != COMPONENT_DOES_NOT_EXIST;
                                               });
@@ -42,7 +42,7 @@ namespace Giraffe {
         bool operator()(const T &e) const {
 
             const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[e.m_index];
-            return e.isValid() && entityComponentsMask[m_cond1] != COMPONENT_DOES_NOT_EXIST &&
+            return m_storage.isValid(e) && entityComponentsMask[m_cond1] != COMPONENT_DOES_NOT_EXIST &&
                    entityComponentsMask[m_cond2] != COMPONENT_DOES_NOT_EXIST;
         }
 
@@ -59,8 +59,7 @@ namespace Giraffe {
 
         bool operator()(const T &e) const {
 
-            const auto &entityComponentsMask = m_storage.m_entitiesComponentsMask[e.m_index];
-            return e.isValid() && entityComponentsMask[m_condition] != COMPONENT_DOES_NOT_EXIST;
+            return m_storage.isValid(e) && m_storage.m_entitiesComponentsMask[e.m_index][m_condition] != COMPONENT_DOES_NOT_EXIST;
         }
 
     private:
