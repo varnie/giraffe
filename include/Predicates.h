@@ -16,7 +16,7 @@ namespace Giraffe {
     template<typename T, typename Storage>
     class PredicateAll {
     public:
-        PredicateAll(const Storage &storage, const std::initializer_list<std::size_t> & conditions)
+        PredicateAll(const Storage &storage, const std::initializer_list<std::size_t> conditions)
                 : m_storage(storage), m_conditions(conditions) { }
 
         bool operator()(const T &e) const {
