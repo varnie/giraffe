@@ -3,7 +3,6 @@
 //
 
 #include <gtest/gtest.h>
-#include <iostream>
 #include "../include/Giraffe.h"
 
 TEST(StorageTest, ComponentsDestructorsInvocation1) {
@@ -11,16 +10,13 @@ TEST(StorageTest, ComponentsDestructorsInvocation1) {
     struct Foo : public Giraffe::Component<Foo> {
         Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
 
-            std::cout << "Foo ctor" << std::endl;
         }
 
         Foo(const Foo &other) : m_pInt(new int(*other.m_pInt)), m_result(other.m_result) {
 
-            std::cout << "Foo copy-ctor" << std::endl;
         }
 
         Foo &operator=(const Foo &other) {
-            std::cout << "Foo copy assign" << std::endl;
             delete m_pInt;
             m_pInt = new int(*other.m_pInt);
             m_result = other.m_result;
@@ -29,7 +25,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation1) {
 
         ~Foo() {
             delete m_pInt;
-            std::cout << "Foo ~dtor" << std::endl;
             m_result++;
         }
 
@@ -53,16 +48,13 @@ TEST(StorageTest, ComponentsDestructorsInvocation2) {
     struct Foo : public Giraffe::Component<Foo> {
         Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
 
-            std::cout << "Foo ctor" << std::endl;
         }
 
         Foo(const Foo &other) : m_pInt(new int(*other.m_pInt)), m_result(other.m_result) {
 
-            std::cout << "Foo copy-ctor" << std::endl;
         }
 
         Foo &operator=(const Foo &other) {
-            std::cout << "Foo copy assign" << std::endl;
             delete m_pInt;
             m_pInt = new int(*other.m_pInt);
             m_result = other.m_result;
@@ -71,7 +63,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation2) {
 
         ~Foo() {
             delete m_pInt;
-            std::cout << "Foo ~dtor" << std::endl;
             m_result++;
         }
 
@@ -95,16 +86,13 @@ TEST(StorageTest, ComponentsDestructorsInvocation3) {
     struct Foo : public Giraffe::Component<Foo> {
         Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
 
-            std::cout << "Foo ctor" << std::endl;
         }
 
         Foo(const Foo &other) : m_pInt(new int(*other.m_pInt)), m_result(other.m_result) {
 
-            std::cout << "Foo copy-ctor" << std::endl;
         }
 
         Foo &operator=(const Foo &other) {
-            std::cout << "Foo copy assign" << std::endl;
             delete m_pInt;
             m_pInt = new int(*other.m_pInt);
             m_result = other.m_result;
@@ -114,7 +102,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation3) {
     public:
         ~Foo() {
             delete m_pInt;
-            std::cout << "Foo ~dtor" << std::endl;
             m_result++;
         }
 
@@ -140,16 +127,13 @@ TEST(StorageTest, ComponentsDestructorsInvocation4) {
     struct Foo : public Giraffe::Component<Foo> {
         Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
 
-            std::cout << "Foo ctor" << std::endl;
         }
 
         Foo(const Foo &other) : m_pInt(new int(*other.m_pInt)), m_result(other.m_result) {
 
-            std::cout << "Foo copy-ctor" << std::endl;
         }
 
         Foo &operator=(const Foo &other) {
-            std::cout << "Foo copy assign" << std::endl;
             delete m_pInt;
             m_pInt = new int(*other.m_pInt);
             m_result = other.m_result;
@@ -158,7 +142,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation4) {
 
         ~Foo() {
             delete m_pInt;
-            std::cout << "Foo ~dtor" << std::endl;
             m_result++;
         }
 
@@ -185,16 +168,13 @@ TEST(StorageTest, ComponentsDestructorsInvocation5) {
     struct Foo : public Giraffe::Component<Foo> {
         Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
 
-            std::cout << "Foo ctor" << std::endl;
         }
 
         Foo(const Foo &other) : m_pInt(new int(*other.m_pInt)), m_result(other.m_result) {
 
-            std::cout << "Foo copy-ctor" << std::endl;
         }
 
         Foo &operator=(const Foo &other) {
-            std::cout << "Foo copy assign" << std::endl;
             delete m_pInt;
             m_pInt = new int(*other.m_pInt);
             m_result = other.m_result;
@@ -203,7 +183,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation5) {
 
         ~Foo() {
             delete m_pInt;
-            std::cout << "Foo ~dtor" << std::endl;
             m_result++;
         }
 
