@@ -157,15 +157,14 @@ namespace Giraffe {
         std::size_t itemIndexInLink = index % Giraffe::POOL_COMPONENTS_PER_CHUNK;
 
         assert(linkIndex < m_links.size());
-        auto *pLink = m_links[linkIndex].get();
 
-        return reinterpret_cast<C *>(&pLink->m_mem[itemIndexInLink]);
+        return reinterpret_cast<C *>(&m_links[linkIndex]->m_mem[itemIndexInLink]);
     }
 
     template<class C>
     void DerivedComponentsPool<C>::removeComponent(std::size_t index) {
 
-        C *component = getComponent(index);
+        const C *component = getComponent(index);
         component->~C();
         m_deletedComponentsIndexes.push_back(index);
     }
