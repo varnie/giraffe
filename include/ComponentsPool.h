@@ -157,7 +157,7 @@ namespace Giraffe {
         std::size_t itemIndexInLink = index % Giraffe::POOL_COMPONENTS_PER_CHUNK;
 
         assert(linkIndex < m_links.size());
-        const auto *pLink = m_links[linkIndex].get();
+        auto *pLink = m_links[linkIndex].get();
 
         return reinterpret_cast<C *>(&pLink->m_mem[itemIndexInLink]);
     }
