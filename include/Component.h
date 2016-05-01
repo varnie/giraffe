@@ -9,9 +9,7 @@ namespace Giraffe {
 
     template<typename T>
     struct Component {
-    protected:
-        //intended to be deleted through the base class pointer, therefore the dtor is not public and virtual
-        ~Component() {}
+        virtual ~Component() {}
     };
 
 }
