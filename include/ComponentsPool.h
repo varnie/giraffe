@@ -79,13 +79,12 @@ namespace Giraffe {
 
             assert(linkIndex < m_links.size());
 
-            DerivedComponentsPool<C>::Link *pLink = m_links[linkIndex].get();
-            pLink->addComponent(itemIndexInLink, std::forward<Args>(args) ...);
+            m_links[linkIndex]->addComponent(itemIndexInLink, std::forward<Args>(args) ...);
 
             return positionIndex;
         } else {
             if (m_curLink->m_used == Giraffe::POOL_COMPONENTS_PER_CHUNK) {
-                //the last link is fully filled; add new link
+                //the last link is filled; add new link
 
 #if __cplusplus == 201402L // C++14
                 m_links.emplace_back(std::make_unique<DerivedComponentsPool<C>::Link>());
@@ -158,7 +157,7 @@ namespace Giraffe {
         std::size_t itemIndexInLink = index % Giraffe::POOL_COMPONENTS_PER_CHUNK;
 
         assert(linkIndex < m_links.size());
-        DerivedComponentsPool<C>::Link *pLink = m_links[linkIndex].get();
+        const auto *pLink = m_links[linkIndex].get();
 
         return reinterpret_cast<C *>(&pLink->m_mem[itemIndexInLink]);
     }
@@ -166,13 +165,7 @@ namespace Giraffe {
     template<class C>
     void DerivedComponentsPool<C>::removeComponent(std::size_t index) {
 
-        std::size_t linkIndex = index / Giraffe::POOL_COMPONENTS_PER_CHUNK;
-        std::size_t itemIndexInLink = index % Giraffe::POOL_COMPONENTS_PER_CHUNK;
-
-        assert(linkIndex < m_links.size());
-        DerivedComponentsPool<C>::Link *pLink = m_links[linkIndex].get();
-
-        C *component = reinterpret_cast<C *>(&pLink->m_mem[itemIndexInLink]);
+        C *component = getComponent(index);
         component->~C();
         m_deletedComponentsIndexes.push_back(index);
     }
@@ -181,7 +174,7 @@ namespace Giraffe {
     std::size_t DerivedComponentsPool<C>::getSize() const {
 
         std::size_t result = 0;
-        auto *link = m_links[0].get();
+        const auto *link = m_links[0].get();
         while (link != nullptr) {
             result += link->m_used;
             link = link->m_next;
