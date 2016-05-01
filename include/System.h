@@ -11,11 +11,11 @@ namespace Giraffe {
 
     class System {
     public:
-        System(Storage &storage) : _storage(storage) { }
+        System(Storage &storage) : m_storage(storage) { }
         virtual ~System() { }
         virtual void update(float f) = 0;
     protected:
-        Storage &_storage;
+        Storage &m_storage;
     };
 
 }

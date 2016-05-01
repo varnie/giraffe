@@ -18,8 +18,8 @@ TEST(StorageTest, SystemSearchComponent) {
 
         virtual void update(float f) {
             m_found = 0;
-            _storage.process<Foo>([&](const Giraffe::Entity &entity) {
-                Foo *pFoo = _storage.getComponent<Foo>(entity);
+            m_storage.process<Foo>([&](const Giraffe::Entity &entity) {
+                Foo *pFoo = m_storage.getComponent<Foo>(entity);
                 (void) pFoo;
                 ++m_found;
             });

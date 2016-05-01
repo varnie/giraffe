@@ -18,7 +18,7 @@ TEST(StorageTest, StorageRetrievals) {
 
         virtual void update(float f) {
             m_found = 0;
-            _storage.process<Foo>([&](const Giraffe::Entity &entity) {
+            m_storage.process<Foo>([&](const Giraffe::Entity &entity) {
                 ++m_found;
             });
         }
