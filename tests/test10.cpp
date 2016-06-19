@@ -7,8 +7,8 @@
 
 TEST(StorageTest, RemoveRestoreEntityHavingComponents) {
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo() : Giraffe::Component<Foo>() { }
+    struct Foo {
+        Foo() { }
     };
 
     Giraffe::Storage storage;
@@ -32,11 +32,13 @@ TEST(StorageTest, RemoveRestoreEntityHavingComponents) {
 
 TEST(StorageTest, RemoveAndAndNewEntityWithComponents) {
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo(int i) : Giraffe::Component<Foo>(), m_i(i) { }
+    struct Foo {
+        Foo(int i) : m_i(i) { }
+
         int getI() const {
             return m_i;
         }
+
         int m_i;
     };
 

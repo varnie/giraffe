@@ -7,8 +7,8 @@
 
 TEST(StorageTest, EntityRemoveComponent) {
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo() : Giraffe::Component<Foo>() { }
+    struct Foo {
+        Foo() { }
     };
 
     class FooSystem : public Giraffe::System {

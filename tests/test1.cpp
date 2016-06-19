@@ -13,8 +13,8 @@ TEST(StorageTest, retrieveNonRegisteredComponent_case_a) {
 
     //this case checks the first case, a)
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo() : Giraffe::Component<Foo>() { }
+    struct Foo {
+        Foo() { }
     };
 
     Giraffe::Storage storage;

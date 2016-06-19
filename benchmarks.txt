@@ -3,26 +3,26 @@
 [----------] 5 tests from StorageTest
 [ RUN      ] StorageTest.TestCreateEntities
 creating 10000000 entities
-0.596352 seconds elapsed
-[       OK ] StorageTest.TestCreateEntities (619 ms)
+0.595312 seconds elapsed
+[       OK ] StorageTest.TestCreateEntities (618 ms)
 [ RUN      ] StorageTest.TestDestroyEntities
 destroying 10000000 entities
-0.184725 seconds elapsed
-[       OK ] StorageTest.TestDestroyEntities (828 ms)
+0.191756 seconds elapsed
+[       OK ] StorageTest.TestDestroyEntities (859 ms)
 [ RUN      ] StorageTest.TestEntityIteration
 iterating over 10000000 entities, unpacking one component
-0.0911635 seconds elapsed
-[       OK ] StorageTest.TestEntityIteration (1255 ms)
+0.0870228 seconds elapsed
+[       OK ] StorageTest.TestEntityIteration (1225 ms)
 [ RUN      ] StorageTest.TestEntityIterationUnpackTwo
 iterating over 10000000 entities, unpacking two components
-0.125141 seconds elapsed
-[       OK ] StorageTest.TestEntityIterationUnpackTwo (1368 ms)
+0.126998 seconds elapsed
+[       OK ] StorageTest.TestEntityIterationUnpackTwo (1531 ms)
 [ RUN      ] StorageTest.TestEntityIterationUnpackThree
 iterating over 10000000 entities, unpacking three components
-0.211268 seconds elapsed
-[       OK ] StorageTest.TestEntityIterationUnpackThree (1553 ms)
-[----------] 5 tests from StorageTest (5630 ms total)
+0.199854 seconds elapsed
+[       OK ] StorageTest.TestEntityIterationUnpackThree (1517 ms)
+[----------] 5 tests from StorageTest (6002 ms total)
 
 [----------] Global test environment tear-down
-[==========] 5 tests from 1 test case ran. (5634 ms total)
+[==========] 5 tests from 1 test case ran. (6002 ms total)
 [  PASSED  ] 5 tests.

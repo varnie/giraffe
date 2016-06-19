@@ -74,8 +74,8 @@ TEST(StorageTest, TestDestroyEntities) {
 
 TEST(StorageTest, TestEntityIteration) {
 
-    struct Position : public Giraffe::Component<Position> {
-        Position() : Giraffe::Component<Position>() { }
+    struct Position {
+        Position() { }
     };
 
     Giraffe::Storage storage;
@@ -100,12 +100,12 @@ TEST(StorageTest, TestEntityIteration) {
 
 TEST(StorageTest, TestEntityIterationUnpackTwo) {
 
-    struct Position : public Giraffe::Component<Position> {
-        Position() : Giraffe::Component<Position>() { }
+    struct Position {
+        Position() { }
     };
 
-    struct Duration : public Giraffe::Component<Duration> {
-        Duration() : Giraffe::Component<Duration>() { }
+    struct Duration {
+        Duration() { }
     };
 
     Giraffe::Storage storage;
@@ -135,16 +135,16 @@ TEST(StorageTest, TestEntityIterationUnpackTwo) {
 
 TEST(StorageTest, TestEntityIterationUnpackThree) {
 
-    struct Position : public Giraffe::Component<Position> {
-        Position() : Giraffe::Component<Position>() { }
+    struct Position {
+        Position() { }
     };
 
-    struct Duration : public Giraffe::Component<Duration> {
-        Duration() : Giraffe::Component<Duration>() { }
+    struct Duration {
+        Duration() { }
     };
 
-    struct Weight : public Giraffe::Component<Weight> {
-        Weight() : Giraffe::Component<Weight>() { }
+    struct Weight {
+        Weight() { }
     };
 
     Giraffe::Storage storage;

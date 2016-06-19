@@ -5,7 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -std=c++11 -pedantic -Werror -Wall -
 
 include_directories(include)
 
-add_library(giraffe SHARED Component.cpp ComponentsPool.cpp System.cpp FilterIterator.cpp Predicates.cpp Storage.cpp Giraffe.cpp)
+add_library(giraffe SHARED ComponentsPool.cpp System.cpp FilterIterator.cpp Predicates.cpp Storage.cpp Giraffe.cpp)
 
 if(NOT DEFINED CMAKE_INSTALL_LIBDIR)
     set(CMAKE_INSTALL_LIBDIR lib)

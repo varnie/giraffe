@@ -7,12 +7,12 @@
 
 TEST(StorageTest, AddNonRegisteredComponentToEntity) {
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo() : Giraffe::Component<Foo>() { }
+    struct Foo {
+        Foo() { }
     };
 
-    struct Bar : public Giraffe::Component<Bar> {
-        Bar() : Giraffe::Component<Bar>() { }
+    struct Bar {
+        Bar() { }
     };
 
     Giraffe::Storage storage;

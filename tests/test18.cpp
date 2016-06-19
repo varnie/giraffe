@@ -7,8 +7,8 @@
 
 TEST(StorageTest, CheckRetrievingAllEntities) {
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo() : Giraffe::Component<Foo>() { }
+    struct Foo {
+        Foo() { }
     };
 
     Giraffe::Storage storage;

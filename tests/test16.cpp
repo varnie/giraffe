@@ -7,8 +7,8 @@
 
 TEST(StorageTest, ComponentsDestructorsInvocation1) {
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
+    struct Foo {
+        Foo(int &result) : m_pInt(new int(29)), m_result(result) {
 
         }
 
@@ -45,8 +45,8 @@ TEST(StorageTest, ComponentsDestructorsInvocation1) {
 
 TEST(StorageTest, ComponentsDestructorsInvocation2) {
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
+    struct Foo {
+        Foo(int &result) : m_pInt(new int(29)), m_result(result) {
 
         }
 
@@ -83,8 +83,8 @@ TEST(StorageTest, ComponentsDestructorsInvocation2) {
 
 TEST(StorageTest, ComponentsDestructorsInvocation3) {
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
+    struct Foo {
+        Foo(int &result) : m_pInt(new int(29)), m_result(result) {
 
         }
 
@@ -124,8 +124,8 @@ TEST(StorageTest, ComponentsDestructorsInvocation3) {
 
 TEST(StorageTest, ComponentsDestructorsInvocation4) {
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
+    struct Foo {
+        Foo(int &result) : m_pInt(new int(29)), m_result(result) {
 
         }
 
@@ -165,8 +165,8 @@ TEST(StorageTest, ComponentsDestructorsInvocation4) {
 
 TEST(StorageTest, ComponentsDestructorsInvocation5) {
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo(int &result) : Giraffe::Component<Foo>(), m_pInt(new int(29)), m_result(result) {
+    struct Foo {
+        Foo(int &result) : m_pInt(new int(29)), m_result(result) {
 
         }
 

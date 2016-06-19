@@ -14,10 +14,10 @@ TEST(StorageTest, retrieveNonRegisteredComponent_case_b) {
 
     //this case checks the second case, b)
 
-    struct Foo : public Giraffe::Component<Foo> {
+    struct Foo {
         int m_i;
 
-        Foo(int i) : Giraffe::Component<Foo>(), m_i(i) { }
+        Foo(int i) : m_i(i) { }
     };
 
     Giraffe::Storage storage;

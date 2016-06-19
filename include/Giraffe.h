@@ -6,7 +6,6 @@
 #define ECS_GIRAFFE_H
 
 #include "./Config.h"
-#include "./Component.h"
 #include "./ComponentsPool.h"
 #include "./FilterIterator.h"
 #include "./Storage.h"

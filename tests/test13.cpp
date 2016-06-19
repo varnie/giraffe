@@ -7,18 +7,18 @@
 
 TEST(StorageTest, SearchThreeRegisteredComponents) {
 
-    struct Foo : public Giraffe::Component<Foo> {
-        Foo() : Giraffe::Component<Foo>() { }
+    struct Foo {
+        Foo() { }
     };
 
-    struct Bar : public Giraffe::Component<Bar> {
-        Bar() : Giraffe::Component<Bar>() { }
+    struct Bar {
+        Bar() { }
     };
 
-    struct Fred : public Giraffe::Component<Fred> {
+    struct Fred {
         int m_i;
 
-        Fred(int i) : Giraffe::Component<Fred>(), m_i(i) { }
+        Fred(int i) : m_i(i) { }
     };
 
     Giraffe::Storage storage;

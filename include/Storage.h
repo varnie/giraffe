@@ -17,7 +17,6 @@
 #include <string> //std::to_string
 #include <cassert>
 
-#include "./Component.h"
 #include "./ComponentsPool.h"
 #include "./FilterIterator.h"
 #include "./Predicates.h"
@@ -52,7 +51,9 @@ namespace Giraffe {
     public:
 
         friend class PredicateOne<Entity, Storage>;
+
         friend class PredicateTwo<Entity, Storage>;
+
         friend class PredicateAll<Entity, Storage>;
 
         using EntitiesContainerT = std::vector<Entity>;
@@ -61,7 +62,9 @@ namespace Giraffe {
         template<template<class Item, class Storage> class Predicate>
         using Iterator = FilterIterator<EntitiesIteratorT, Predicate<Entity, Storage> >;
 
-        Storage() : m_entitiesComponentsMask(), m_entities(), m_deletedEntities(), m_entitiesVersions(),  m_pools(), m_componentsKindsCount(0) { }
+        Storage()
+                : m_entitiesComponentsMask(), m_entities(), m_deletedEntities(), m_entitiesVersions(), m_pools(),
+                  m_componentsKindsCount(0) { }
 
         bool isValid(const Entity &entity) const {
 
@@ -117,10 +120,6 @@ namespace Giraffe {
         template<typename C>
         void registerComponentKind() {
 
-            //
-            static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
-            //
-
             //has the component kind/family been registered yet?
             if (DerivedComponentsPool<C>::index == COMPONENT_DOES_NOT_EXIST) {
 
@@ -142,10 +141,6 @@ namespace Giraffe {
         template<typename C>
         std::size_t getPoolSize() const {
 
-            //
-            static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
-            //
-
             std::size_t componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
             if (DerivedComponentsPool<C>::index == COMPONENT_DOES_NOT_EXIST) {
                 return 0;
@@ -159,10 +154,6 @@ namespace Giraffe {
         void addComponent(const Entity &entity, Args &&... args) {
 
             assert(entity.isValid() && "invalid entity");
-
-            //
-            static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
-            //
 
             std::size_t componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
             if (DerivedComponentsPool<C>::index == COMPONENT_DOES_NOT_EXIST) {
@@ -192,10 +183,6 @@ namespace Giraffe {
 
             assert(entity.isValid() && "invalid entity");
 
-            //
-            static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
-            //
-
             std::size_t componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
             if (componentKindIndex == COMPONENT_DOES_NOT_EXIST) {
                 return;
@@ -220,10 +207,6 @@ namespace Giraffe {
         bool hasComponent(const Entity &entity) const {
 
             assert(entity.isValid() && "invalid entity");
-
-            //
-            static_assert(std::is_base_of<Component<C>, C>::value, "CRTP failure");
-            //
 
             std::size_t componentKindIndex = DerivedComponentsPool<C>::getKindIndex();
             std::size_t entityIndex = entity.m_index;
@@ -260,9 +243,9 @@ namespace Giraffe {
         Iterator<PredicateAll> begin() {
 
             PredicateAll<Entity, Storage> predicate(*this, {DerivedComponentsPool<A1>::getKindIndex(),
-                                                   DerivedComponentsPool<A2>::getKindIndex(),
-                                                   DerivedComponentsPool<A3>::getKindIndex(),
-                                                   DerivedComponentsPool<Ax>::getKindIndex() ...});
+                                                            DerivedComponentsPool<A2>::getKindIndex(),
+                                                            DerivedComponentsPool<A3>::getKindIndex(),
+                                                            DerivedComponentsPool<Ax>::getKindIndex() ...});
             return Iterator<PredicateAll>(m_entities.begin(), m_entities.end(), predicate);
         }
 
@@ -271,7 +254,7 @@ namespace Giraffe {
         Iterator<PredicateTwo> begin() {
 
             PredicateTwo<Entity, Storage> predicate(*this, DerivedComponentsPool<A1>::getKindIndex(),
-                                           DerivedComponentsPool<A2>::getKindIndex());
+                                                    DerivedComponentsPool<A2>::getKindIndex());
             return Iterator<PredicateTwo>(m_entities.begin(), m_entities.end(), predicate);
         }
 
@@ -288,9 +271,9 @@ namespace Giraffe {
         Iterator<PredicateAll> end() {
 
             PredicateAll<Entity, Storage> predicate(*this, {DerivedComponentsPool<A1>::getKindIndex(),
-                                                   DerivedComponentsPool<A2>::getKindIndex(),
-                                                   DerivedComponentsPool<A3>::getKindIndex(),
-                                                   DerivedComponentsPool<Ax>::getKindIndex() ...});
+                                                            DerivedComponentsPool<A2>::getKindIndex(),
+                                                            DerivedComponentsPool<A3>::getKindIndex(),
+                                                            DerivedComponentsPool<Ax>::getKindIndex() ...});
             return Iterator<PredicateAll>(m_entities.end(), m_entities.end(), predicate);
         }
 
@@ -299,7 +282,7 @@ namespace Giraffe {
         Iterator<PredicateTwo> end() {
 
             PredicateTwo<Entity, Storage> predicate(*this, DerivedComponentsPool<A1>::getKindIndex(),
-                                           DerivedComponentsPool<A2>::getKindIndex());
+                                                    DerivedComponentsPool<A2>::getKindIndex());
             return Iterator<PredicateTwo>(m_entities.end(), m_entities.end(), predicate);
         }
 
@@ -316,11 +299,12 @@ namespace Giraffe {
         void process(std::function<void(const Entity &entity)> func) {
 
             PredicateAll<Entity, Storage> predicate(*this, {DerivedComponentsPool<A1>::getKindIndex(),
-                                                   DerivedComponentsPool<A2>::getKindIndex(),
-                                                   DerivedComponentsPool<A3>::getKindIndex(),
-                                                   DerivedComponentsPool<Ax>::getKindIndex() ...});
+                                                            DerivedComponentsPool<A2>::getKindIndex(),
+                                                            DerivedComponentsPool<A3>::getKindIndex(),
+                                                            DerivedComponentsPool<Ax>::getKindIndex() ...});
 
-            for (Iterator<PredicateAll> iterBegin = Iterator<PredicateAll>(m_entities.begin(), m_entities.end(), predicate),
+            for (Iterator<PredicateAll> iterBegin = Iterator<PredicateAll>(m_entities.begin(), m_entities.end(),
+                                                                           predicate),
                          iterEnd = Iterator<PredicateAll>(m_entities.end(), m_entities.end(), predicate);
                  iterBegin != iterEnd;
                  ++iterBegin) {
@@ -334,7 +318,7 @@ namespace Giraffe {
         void process(std::function<void(const Entity &entity)> func) {
 
             PredicateTwo<Entity, Storage> predicate(*this, DerivedComponentsPool<A1>::getKindIndex(),
-                                           DerivedComponentsPool<A2>::getKindIndex());
+                                                    DerivedComponentsPool<A2>::getKindIndex());
 
             for (Iterator<PredicateTwo> iterBegin = Iterator<PredicateTwo>(m_entities.begin(), m_entities.end(),
                                                                            predicate),
@@ -379,9 +363,9 @@ namespace Giraffe {
         Result<Iterator<PredicateAll>> range() {
 
             PredicateAll<Entity, Storage> predicate(*this, {DerivedComponentsPool<A1>::getKindIndex(),
-                                                   DerivedComponentsPool<A2>::getKindIndex(),
-                                                   DerivedComponentsPool<A3>::getKindIndex(),
-                                                   DerivedComponentsPool<Ax>::getKindIndex() ...});
+                                                            DerivedComponentsPool<A2>::getKindIndex(),
+                                                            DerivedComponentsPool<A3>::getKindIndex(),
+                                                            DerivedComponentsPool<Ax>::getKindIndex() ...});
 
             return Result<Iterator<PredicateAll>>(
                     Iterator<PredicateAll>(m_entities.begin(), m_entities.end(), predicate),
@@ -394,7 +378,7 @@ namespace Giraffe {
         Result<Iterator<PredicateTwo>> range() {
 
             PredicateTwo<Entity, Storage> predicate(*this, DerivedComponentsPool<A1>::getKindIndex(),
-                                           DerivedComponentsPool<A2>::getKindIndex());
+                                                    DerivedComponentsPool<A2>::getKindIndex());
 
             return Result<Iterator<PredicateTwo>>(
                     Iterator<PredicateTwo>(m_entities.begin(), m_entities.end(), predicate),
