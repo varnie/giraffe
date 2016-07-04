@@ -39,9 +39,6 @@ namespace Giraffe {
 
         std::size_t getSize() const;
 
-        static std::size_t getKindIndex() {
-            return index;
-        }
         static std::size_t index;
     private:
 
