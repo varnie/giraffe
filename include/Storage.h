@@ -130,11 +130,7 @@ namespace Giraffe {
 
                 DerivedComponentsPool<C>::index = m_componentsKindsCount++;
 
-#if __cplusplus == 201402L // C++14
                 m_pools.emplace_back(std::make_unique<DerivedComponentsPool<C> >());
-#else // C++11
-                m_pools.emplace_back(make_unique<DerivedComponentsPool<C> >());
-#endif
             }
         }
 

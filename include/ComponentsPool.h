@@ -83,11 +83,7 @@ namespace Giraffe {
             if (m_curLink->m_used == Giraffe::POOL_COMPONENTS_PER_CHUNK) {
                 //the last link is filled; add new link
 
-#if __cplusplus == 201402L // C++14
                 m_links.emplace_back(std::make_unique<DerivedComponentsPool<C>::Link>());
-#else // C++11
-                m_links.emplace_back(make_unique<DerivedComponentsPool<C>::Link>());
-#endif
 
                 m_curLink->m_next = m_links.back().get();
                 m_curLink = m_curLink->m_next;
@@ -108,11 +104,7 @@ namespace Giraffe {
         ComponentsPool(), m_deletedComponentsIndexes(),
         m_links(), m_curLink(nullptr) {
 
-#if __cplusplus == 201402L // C++14
         m_links.emplace_back(std::make_unique<DerivedComponentsPool<C>::Link>());
-#else // C++11
-        m_links.emplace_back(make_unique<DerivedComponentsPool<C>::Link>());
-#endif
 
         m_curLink = m_links.back().get();
     }
