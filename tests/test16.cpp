@@ -34,9 +34,12 @@ TEST(StorageTest, ComponentsDestructorsInvocation1) {
 
     int result = 0;
     {
-        Giraffe::Storage storage;
-        storage.registerComponentKind<Foo>();
-        Giraffe::Entity e = storage.addEntity();
+        using StorageT = Giraffe::Storage<Foo>;
+        using EntityT = Giraffe::Entity<StorageT>;
+
+        StorageT storage;
+        //storage.registerComponentKind<Foo>();
+        EntityT e = storage.addEntity();
     }
 
     //checks that no destructors of components were called, because no components were added
@@ -72,9 +75,12 @@ TEST(StorageTest, ComponentsDestructorsInvocation2) {
 
     int result = 0;
     {
-        Giraffe::Storage storage;
-        storage.registerComponentKind<Foo>();
-        Giraffe::Entity e = storage.addEntity();
+        using StorageT = Giraffe::Storage<Foo>;
+        using EntityT = Giraffe::Entity<StorageT>;
+
+        StorageT storage;
+        //storage.registerComponentKind<Foo>();
+        EntityT e = storage.addEntity();
         e.addComponent<Foo>(result);
     }
     //checks that 1 destructor of components was called at the end of scope, because only 1 component was added
@@ -112,9 +118,12 @@ TEST(StorageTest, ComponentsDestructorsInvocation3) {
     int result = 0;
 
     //checks that explicit removeComponent calls the dtor
-    Giraffe::Storage storage;
-    storage.registerComponentKind<Foo>();
-    Giraffe::Entity e = storage.addEntity();
+    using StorageT = Giraffe::Storage<Foo>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
+    //storage.registerComponentKind<Foo>();
+    EntityT e = storage.addEntity();
     e.addComponent<Foo>(result);
     //must explicitly call the dtor
     e.removeComponent<Foo>();
@@ -152,9 +161,12 @@ TEST(StorageTest, ComponentsDestructorsInvocation4) {
     int result = 0;
 
     {
-        Giraffe::Storage storage;
-        storage.registerComponentKind<Foo>();
-        Giraffe::Entity e = storage.addEntity();
+        using StorageT = Giraffe::Storage<Foo>;
+        using EntityT = Giraffe::Entity<StorageT>;
+
+        StorageT storage;
+        //storage.registerComponentKind<Foo>();
+        EntityT e = storage.addEntity();
         e.addComponent<Foo>(result);
         e.removeComponent<Foo>();
         e.addComponent<Foo>(result);
@@ -192,11 +204,14 @@ TEST(StorageTest, ComponentsDestructorsInvocation5) {
 
     int result = 0;
 
-    Giraffe::Storage storage;
-    storage.registerComponentKind<Foo>();
+    using StorageT = Giraffe::Storage<Foo>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
+    //storage.registerComponentKind<Foo>();
 
     for (int i = 0; i < 5; ++i) {
-        Giraffe::Entity eX = storage.addEntity();
+        EntityT eX = storage.addEntity();
         eX.addComponent<Foo>(result);
         storage.removeEntity(eX);
     }

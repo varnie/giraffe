@@ -19,13 +19,16 @@ TEST(StorageTest, EntityHasComponents) {
         Fred() { }
     };
 
-    Giraffe::Storage storage;
-    storage.registerComponentKind<Foo>();
-    storage.registerComponentKind<Bar>();
+    using StorageT = Giraffe::Storage<Foo, Bar, Fred>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
+    //storage.registerComponentKind<Foo>();
+    //storage.registerComponentKind<Bar>();
     //note, not registered component kind
     //storage.registerComponentKind<Fred>();
 
-    Giraffe::Entity e1 = storage.addEntity();
+    EntityT e1 = storage.addEntity();
     e1.addComponent<Foo>();
     e1.addComponent<Bar>();
 

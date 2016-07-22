@@ -11,8 +11,11 @@ TEST(StorageTest, EntityRemoveNonRegisteredAndNonAddedToEntityComponent) {
         Foo() { }
     };
 
-    Giraffe::Storage storage;
-    Giraffe::Entity e = storage.addEntity();
+    using StorageT = Giraffe::Storage<Foo>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
+    EntityT e = storage.addEntity();
 
     e.removeComponent<Foo>();
 

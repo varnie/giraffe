@@ -11,14 +11,17 @@ TEST(StorageTest, EntityRemoveRecreateComponent) {
         Foo() { }
     };
 
-    class FooSystem : public Giraffe::System {
+    using StorageT = Giraffe::Storage<Foo>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    class FooSystem : public Giraffe::System<StorageT> {
         std::size_t m_found;
     public:
-        FooSystem(Giraffe::Storage &storage) : Giraffe::System(storage), m_found(0) { }
+        FooSystem(StorageT &storage) : Giraffe::System<StorageT>(storage), m_found(0) { }
 
         virtual void update(float f) {
             m_found = 0;
-            m_storage.process<Foo>([&](const Giraffe::Entity &entity) {
+            m_storage.process<Foo>([&](const EntityT &entity) {
                 Foo *pFoo = m_storage.getComponent<Foo>(entity);
                 (void) pFoo; //so that the compiler don't optimize out the line above
                 ++m_found;
@@ -30,16 +33,16 @@ TEST(StorageTest, EntityRemoveRecreateComponent) {
         }
     };
 
-    Giraffe::Storage storage;
-    storage.registerComponentKind<Foo>();
+    StorageT storage;
+    //storage.registerComponentKind<Foo>();
 
     std::size_t poolSize1 = storage.getPoolSize<Foo>();
-    Giraffe::Entity e1 = storage.addEntity();
+    EntityT e1 = storage.addEntity();
     e1.addComponent<Foo>();
     e1.removeComponent<Foo>();
 
     std::size_t poolSize2 = storage.getPoolSize<Foo>();
-    Giraffe::Entity e2 = storage.addEntity();
+    EntityT e2 = storage.addEntity();
     e2.addComponent<Foo>();
 
     std::size_t poolSize3 = storage.getPoolSize<Foo>();

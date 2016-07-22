@@ -15,9 +15,12 @@ TEST(StorageTest, RegisterDifferentComponentsInStorage) {
         Bar() { }
     };
 
-    Giraffe::Storage storage;
-    storage.registerComponentKind<Foo>();
-    storage.registerComponentKind<Bar>();
+    using StorageT = Giraffe::Storage<Foo, Bar>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
+    //storage.registerComponentKind<Foo>();
+    //storage.registerComponentKind<Bar>();
 
     std::size_t componentFooKindIndex = Giraffe::DerivedComponentsPool<Foo>::index;
     std::size_t componentBarKindIndex = Giraffe::DerivedComponentsPool<Bar>::index;

@@ -7,8 +7,10 @@
 
 namespace Giraffe {
 
+    template <class... Types>
     class Storage;
 
+    template <class Storage>
     class System {
     public:
         System(Storage &storage) : m_storage(storage) { }

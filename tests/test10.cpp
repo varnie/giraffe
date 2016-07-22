@@ -11,14 +11,17 @@ TEST(StorageTest, RemoveRestoreEntityHavingComponents) {
         Foo() { }
     };
 
-    Giraffe::Storage storage;
-    storage.registerComponentKind<Foo>();
+    using StorageT = Giraffe::Storage<Foo>;
+    using EntityT = Giraffe::Entity<StorageT>;
 
-    Giraffe::Entity e = storage.addEntity();
+    StorageT storage;
+    //storage.registerComponentKind<Foo>();
+
+    EntityT e = storage.addEntity();
     e.addComponent<Foo>();
 
     storage.removeEntity(e);
-    Giraffe::Entity e1 = storage.addEntity();
+    EntityT e1 = storage.addEntity();
 
     std::size_t result = 0;
     auto iterBegin = storage.begin<Foo>();
@@ -42,14 +45,17 @@ TEST(StorageTest, RemoveAndAndNewEntityWithComponents) {
         int m_i;
     };
 
-    Giraffe::Storage storage;
-    storage.registerComponentKind<Foo>();
+    using StorageT = Giraffe::Storage<Foo>;
+    using EntityT = Giraffe::Entity<StorageT>;
 
-    Giraffe::Entity e1 = storage.addEntity();
+    StorageT storage;
+    //storage.registerComponentKind<Foo>();
+
+    EntityT e1 = storage.addEntity();
     e1.addComponent<Foo>(42);
     storage.removeEntity(e1);
 
-    Giraffe::Entity e2 = storage.addEntity();
+    EntityT e2 = storage.addEntity();
     e2.addComponent<Foo>(43);
 
     std::size_t count = 0;

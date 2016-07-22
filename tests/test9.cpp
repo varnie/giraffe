@@ -7,23 +7,26 @@
 
 TEST(StorageTest, RemoveRestoreEntity) {
 
-    Giraffe::Storage storage;
+    using StorageT = Giraffe::Storage<>;
+    using EntityT = Giraffe::Entity<StorageT>;
 
-    Giraffe::Entity e1 = storage.addEntity();
-    Giraffe::Entity e2 = storage.addEntity();
-    Giraffe::Entity e3 = storage.addEntity();
+    StorageT storage;
+
+    EntityT e1 = storage.addEntity();
+    EntityT e2 = storage.addEntity();
+    EntityT e3 = storage.addEntity();
 
     storage.removeEntity(e2);
     EXPECT_FALSE(e2.isValid());
 
-    Giraffe::Entity e4 = storage.addEntity();
+    EntityT e4 = storage.addEntity();
     EXPECT_EQ(e4.m_index, 1);
     EXPECT_EQ(e4.m_version, 1);
     EXPECT_FALSE(e2.isValid());
     EXPECT_TRUE(e4.isValid());
 
     storage.removeEntity(e4);
-    Giraffe::Entity e5 = storage.addEntity();
+    EntityT e5 = storage.addEntity();
     EXPECT_EQ(e5.m_index, 1);
     EXPECT_EQ(e5.m_version, 2);
     EXPECT_FALSE(e2.isValid());

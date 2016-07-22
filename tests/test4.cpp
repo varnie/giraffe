@@ -11,10 +11,13 @@ TEST(StorageTest, RegisterTheSameComponentInStorage) {
         Foo() { }
     };
 
-    Giraffe::Storage storage;
-    for (int i = 0; i < 10; ++i) {
-        storage.registerComponentKind<Foo>();
-    }
+    using StorageT = Giraffe::Storage<Foo>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
+    //for (int i = 0; i < 10; ++i) {
+    //    storage.registerComponentKind<Foo>();
+    //}
 
     std::size_t componentKindIndex = Giraffe::DerivedComponentsPool<Foo>::index;
 

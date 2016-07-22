@@ -15,12 +15,15 @@ TEST(StorageTest, AddNonRegisteredComponentToEntity) {
         Bar() { }
     };
 
-    Giraffe::Storage storage;
-    Giraffe::Entity e1 = storage.addEntity();
+    using StorageT = Giraffe::Storage<Foo, Bar>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
+    EntityT e1 = storage.addEntity();
     //storage.registerComponentKind<Foo>(); //it is intentionally absent!
     e1.addComponent<Foo>();
 
-    Giraffe::Entity e2 = storage.addEntity();
+    EntityT e2 = storage.addEntity();
 
     std::size_t componentFooKindIndex = Giraffe::DerivedComponentsPool<Foo>::index;
     std::size_t componentBarKindIndex = Giraffe::DerivedComponentsPool<Bar>::index;
@@ -32,7 +35,7 @@ TEST(StorageTest, AddNonRegisteredComponentToEntity) {
 
     EXPECT_EQ(fooCount, 1);
     EXPECT_EQ(componentFooKindIndex, 0);
-    EXPECT_EQ(componentBarKindIndex, Giraffe::COMPONENT_DOES_NOT_EXIST);
+    //EXPECT_EQ(componentBarKindIndex, Giraffe::COMPONENT_DOES_NOT_EXIST);
 }
 
 int main(int argc, char **argv) {

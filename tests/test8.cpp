@@ -11,14 +11,17 @@ TEST(StorageTest, StorageRetrievals) {
         Foo() { }
     };
 
-    class FooSystem : public Giraffe::System {
+    using StorageT = Giraffe::Storage<Foo>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    class FooSystem : public Giraffe::System<StorageT> {
         std::size_t m_found;
     public:
-        FooSystem(Giraffe::Storage &storage) : Giraffe::System(storage), m_found(0) { }
+        FooSystem(StorageT &storage) : Giraffe::System<StorageT>(storage), m_found(0) { }
 
         virtual void update(float f) {
             m_found = 0;
-            m_storage.process<Foo>([&](const Giraffe::Entity &entity) {
+            m_storage.process<Foo>([&](const EntityT &entity) {
                 ++m_found;
             });
         }
@@ -28,16 +31,16 @@ TEST(StorageTest, StorageRetrievals) {
         }
     };
 
-    Giraffe::Storage storage;
-    storage.registerComponentKind<Foo>();
+    StorageT storage;
+    //storage.registerComponentKind<Foo>();
 
-    Giraffe::Entity e1 = storage.addEntity();
+    EntityT e1 = storage.addEntity();
     e1.addComponent<Foo>();
-    Giraffe::Entity e2 = storage.addEntity();
+    EntityT e2 = storage.addEntity();
     e2.addComponent<Foo>();
-    Giraffe::Entity e3 = storage.addEntity();
+    EntityT e3 = storage.addEntity();
     e3.addComponent<Foo>();
-    Giraffe::Entity e4 = storage.addEntity();
+    EntityT e4 = storage.addEntity();
 
     std::size_t result1 = 0, result2 = 0, result3 = 0;
     //using storage system

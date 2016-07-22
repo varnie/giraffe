@@ -40,7 +40,9 @@ private:
 
 TEST(StorageTest, TestCreateEntities) {
 
-    Giraffe::Storage storage;
+    using StorageT = Giraffe::Storage<>;
+
+    StorageT storage;
     AutoTimer t;
 
     std::uint64_t count = 10000000L;
@@ -55,7 +57,9 @@ TEST(StorageTest, TestCreateEntities) {
 
 TEST(StorageTest, TestDestroyEntities) {
 
-    Giraffe::Storage storage;
+    using StorageT = Giraffe::Storage<>;
+
+    StorageT storage;
 
     std::uint64_t count = 10000000L;
     for (std::uint64_t i = 0; i < count; i++) {
@@ -78,7 +82,10 @@ TEST(StorageTest, TestEntityIteration) {
         Position() { }
     };
 
-    Giraffe::Storage storage;
+    using StorageT = Giraffe::Storage<Position>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
 
     int count = 10000000;
     for (int i = 0; i < count; i++) {
@@ -89,7 +96,7 @@ TEST(StorageTest, TestEntityIteration) {
     AutoTimer t;
     std::cout << "iterating over " << count << " entities, unpacking one component" << std::endl;
 
-    for (const Giraffe::Entity &e: storage.range<Position>()) {
+    for (const EntityT &e: storage.range<Position>()) {
         auto *pPosition = e.getComponent<Position>();
         (void) pPosition;
         ASSERT_TRUE(pPosition != nullptr);
@@ -108,7 +115,10 @@ TEST(StorageTest, TestEntityIterationUnpackTwo) {
         Duration() { }
     };
 
-    Giraffe::Storage storage;
+    using StorageT = Giraffe::Storage<Position, Duration>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
 
     int count = 10000000;
     for (int i = 0; i < count; i++) {
@@ -120,7 +130,7 @@ TEST(StorageTest, TestEntityIterationUnpackTwo) {
     AutoTimer t;
     std::cout << "iterating over " << count << " entities, unpacking two components" << std::endl;
 
-    for (const Giraffe::Entity &e: storage.range<Position, Duration>()) {
+    for (const EntityT &e: storage.range<Position, Duration>()) {
         auto *pPosition = e.getComponent<Position>();
         (void) pPosition;
         ASSERT_TRUE(pPosition != nullptr);
@@ -147,7 +157,10 @@ TEST(StorageTest, TestEntityIterationUnpackThree) {
         Weight() { }
     };
 
-    Giraffe::Storage storage;
+    using StorageT = Giraffe::Storage<Position, Duration, Weight>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
 
     int count = 10000000;
     for (int i = 0; i < count; i++) {
@@ -160,7 +173,7 @@ TEST(StorageTest, TestEntityIterationUnpackThree) {
     AutoTimer t;
     std::cout << "iterating over " << count << " entities, unpacking three components" << std::endl;
 
-    for (const Giraffe::Entity &e: storage.range<Position, Duration, Weight>()) {
+    for (const EntityT &e: storage.range<Position, Duration, Weight>()) {
         auto *pPosition = e.getComponent<Position>();
         (void) pPosition;
         ASSERT_TRUE(pPosition != nullptr);

@@ -17,10 +17,13 @@ TEST(StorageTest, retrieveNonRegisteredComponent_case_a) {
         Foo() { }
     };
 
-    Giraffe::Storage storage;
+    using StorageT = Giraffe::Storage<Foo>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
     //storage.registerComponentKind<Foo>(); //intentionally commented out
 
-    Giraffe::Entity e = storage.addEntity();
+    EntityT e = storage.addEntity();
 
     bool mustThrow;
     try {

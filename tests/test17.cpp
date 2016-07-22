@@ -11,10 +11,13 @@ TEST(StorageTest, CheckAddingTheSameComponentToEntity) {
         Foo() { }
     };
 
-    Giraffe::Storage storage;
-    storage.registerComponentKind<Foo>();
+    using StorageT = Giraffe::Storage<Foo>;
+    using EntityT = Giraffe::Entity<StorageT>;
 
-    Giraffe::Entity e = storage.addEntity();
+    StorageT storage;
+    //storage.registerComponentKind<Foo>();
+
+    EntityT e = storage.addEntity();
     e.addComponent<Foo>();
     e.addComponent<Foo>();
 

@@ -21,15 +21,18 @@ TEST(StorageTest, SearchThreeRegisteredComponents) {
         Fred(int i) : m_i(i) { }
     };
 
-    Giraffe::Storage storage;
-    storage.registerComponentKind<Foo>();
-    storage.registerComponentKind<Bar>();
-    storage.registerComponentKind<Fred>();
+    using StorageT = Giraffe::Storage<Foo, Bar, Fred>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
+    //storage.registerComponentKind<Foo>();
+    //storage.registerComponentKind<Bar>();
+    //storage.registerComponentKind<Fred>();
 
     int iMustBe = 0;
     int count = 20;
     for (int i = 0; i < count; ++i) {
-        Giraffe::Entity e1 = storage.addEntity();
+        EntityT e1 = storage.addEntity();
         e1.addComponent<Foo>();
         e1.addComponent<Bar>();
         e1.addComponent<Fred>(i);

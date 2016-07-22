@@ -11,10 +11,13 @@ TEST(StorageTest, CheckRetrievingAllEntities) {
         Foo() { }
     };
 
-    Giraffe::Storage storage;
+    using StorageT = Giraffe::Storage<>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    StorageT storage;
 
     for (int i = 0; i < 5; ++i) {
-        Giraffe::Entity e = storage.addEntity();
+        EntityT e = storage.addEntity();
     }
 
     std::size_t count1 = 0, count2 = 0;
@@ -25,7 +28,7 @@ TEST(StorageTest, CheckRetrievingAllEntities) {
 
     EXPECT_EQ(count1, 5);
 
-    storage.process([&](const Giraffe::Entity &entity) {
+    storage.process([&](const EntityT &entity) {
         ++count2;
     });
 

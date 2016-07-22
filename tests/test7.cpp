@@ -11,14 +11,17 @@ TEST(StorageTest, EntityRemoveComponent) {
         Foo() { }
     };
 
-    class FooSystem : public Giraffe::System {
+    using StorageT = Giraffe::Storage<Foo>;
+    using EntityT = Giraffe::Entity<StorageT>;
+
+    class FooSystem : public Giraffe::System<StorageT> {
         std::size_t m_found;
     public:
-        FooSystem(Giraffe::Storage &storage) : Giraffe::System(storage), m_found(0) { }
+        FooSystem(StorageT &storage) : Giraffe::System<StorageT>(storage), m_found(0) { }
 
         virtual void update(float f) {
             m_found = 0;
-            m_storage.process<Foo>([&](const Giraffe::Entity &entity) {
+            m_storage.process<Foo>([&](const EntityT &entity) {
                 Foo *pFoo = m_storage.getComponent<Foo>(entity);
                 (void) pFoo;
                 ++m_found;
@@ -30,10 +33,10 @@ TEST(StorageTest, EntityRemoveComponent) {
         }
     };
 
-    Giraffe::Storage storage;
-    storage.registerComponentKind<Foo>();
+    StorageT storage;
+    //storage.registerComponentKind<Foo>();
 
-    Giraffe::Entity e = storage.addEntity();
+    EntityT e = storage.addEntity();
     e.addComponent<Foo>();
     e.removeComponent<Foo>();
 
