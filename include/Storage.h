@@ -23,6 +23,21 @@
 #include "./FilterIterator.h"
 #include "./Predicates.h"
 
+namespace {
+    template<typename T, typename ...Ts>
+    struct contains;
+
+    template<typename T>
+    struct contains<T> {
+        static constexpr bool value = false;
+    };
+
+    template<typename T1, typename T2, typename ...Ts>
+    struct contains<T1, T2, Ts...> {
+        static constexpr bool value = std::is_same<T1, T2>::value ? true : contains<T1, Ts...>::value;
+    };
+}
+
 namespace Giraffe {
 
     template <class Storage>
@@ -136,6 +151,7 @@ namespace Giraffe {
         template<typename C, typename ... Args>
         void addComponent(const Entity<Storage> &entity, Args &&... args) {
 
+            static_assert(contains<C, Components...>::value, "type is not registered");
             assert(entity.isValid() && "invalid entity");
 
             std::size_t componentKindIndex = DerivedComponentsPool<C>::index;
@@ -162,6 +178,7 @@ namespace Giraffe {
         template<typename C>
         void removeComponent(const Entity<Storage> &entity) {
 
+            static_assert(contains<C, Components...>::value, "type is not registered");
             assert(entity.isValid() && "invalid entity");
 
             std::size_t componentKindIndex = DerivedComponentsPool<C>::index;
@@ -191,6 +208,7 @@ namespace Giraffe {
         template<typename C>
         bool hasComponent(const Entity<Storage> &entity) const {
 
+            static_assert(contains<C, Components...>::value, "type is not registered");
             assert(entity.isValid() && "invalid entity");
 
             std::size_t componentKindIndex = DerivedComponentsPool<C>::index;
@@ -203,6 +221,7 @@ namespace Giraffe {
         template<typename C>
         C *getComponent(const Entity<Storage> &entity) const {
 
+            static_assert(contains<C, Components...>::value, "type is not registered");
             assert(entity.isValid() && "invalid entity");
 
             std::size_t componentKindIndex = DerivedComponentsPool<C>::index;
