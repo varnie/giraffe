@@ -20,7 +20,6 @@ namespace Giraffe {
     class ComponentsPool {
     public:
         virtual ~ComponentsPool() {}
-        virtual void removeComponent(std::size_t index) = 0;
     };
 
     template <class C>
@@ -33,7 +32,7 @@ namespace Giraffe {
         template<typename ... Args>
         std::size_t addComponent(Args &&... args);
 
-        void removeComponent(std::size_t index) override;
+        void removeComponent(std::size_t index);
 
         C *getComponent(std::size_t index);
 

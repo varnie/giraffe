@@ -193,11 +193,8 @@ namespace Giraffe {
             if (curComponentIndex != COMPONENT_DOES_NOT_EXIST) {
                 entityComponentsMask[componentKindIndex] = COMPONENT_DOES_NOT_EXIST;
 
-                //no need to cast, i.e.:
-                //DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(_pools[componentKindIndex].get());
-                //poolC->removeComponent(curComponentIndex);
-
-                m_pools[componentKindIndex]->removeComponent(curComponentIndex);
+                DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(m_pools[componentKindIndex].get());
+                poolC->removeComponent(curComponentIndex);
 
                 //TODO: refactor out
                 auto &line = std::get<typename std::vector<C *>>(m_vals);
