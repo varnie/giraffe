@@ -106,19 +106,14 @@ namespace Giraffe {
             m_deletedEntities.push_back(entity);
             ++m_entitiesVersions[entityIndex];
 
-            auto &componentsMask = m_entitiesComponentsMask[entityIndex];
-
             //remove all entity's components from the pools
-            for (std::size_t i = 0, count = componentsMask.size(); i < count; ++i) {
-                std::size_t curComponentIndex = componentsMask[i];
-                if (curComponentIndex != COMPONENT_DOES_NOT_EXIST) {
-                    //tricky
-                    m_pools[i]->removeComponent(curComponentIndex);
-                }
-            }
+            using expander = int[];
+            (void) expander{ 0, (removeComponent<Components>(entity), 0)... };
 
             //reset the mask
-            componentsMask.assign(componentsMask.size(), COMPONENT_DOES_NOT_EXIST);
+            auto &entityComponentsMask = m_entitiesComponentsMask[entityIndex];
+            std::size_t componentsCount = entityComponentsMask.size();
+            entityComponentsMask.assign(componentsCount, COMPONENT_DOES_NOT_EXIST);
         }
 
         std::size_t getEntitiesCount() const {
@@ -127,27 +122,10 @@ namespace Giraffe {
         }
 
         template<typename C>
-        void registerComponentKind() {
-
-            //has the component kind/family been registered yet?
-            if (DerivedComponentsPool<C>::index == COMPONENT_DOES_NOT_EXIST) {
-
-                if (m_componentsKindsCount == MAX_COMPONENTS_COUNT) {
-                    throw std::runtime_error(
-                            "Maximum number of components exceeded: " + std::to_string(MAX_COMPONENTS_COUNT));
-                }
-
-                DerivedComponentsPool<C>::index = m_componentsKindsCount++;
-
-                m_pools.emplace_back(std::make_unique<DerivedComponentsPool<C> >());
-            }
-        }
-
-        template<typename C>
         std::size_t getPoolSize() const {
 
             std::size_t componentKindIndex = DerivedComponentsPool<C>::index;
-            if (DerivedComponentsPool<C>::index == COMPONENT_DOES_NOT_EXIST) {
+            if (componentKindIndex == COMPONENT_DOES_NOT_EXIST) {
                 return 0;
             }
 
@@ -161,30 +139,24 @@ namespace Giraffe {
             assert(entity.isValid() && "invalid entity");
 
             std::size_t componentKindIndex = DerivedComponentsPool<C>::index;
-            /*if (DerivedComponentsPool<C>::index == COMPONENT_DOES_NOT_EXIST) {
-                //an attempt to add non registered component
 
-                registerComponentKind<C>();
-                componentKindIndex = DerivedComponentsPool<C>::index;
-
-                for (auto &entityComponentMask: m_entitiesComponentsMask) {
-                    entityComponentMask.push_back(COMPONENT_DOES_NOT_EXIST);
-                }
-            } else { */
-                if (m_entitiesComponentsMask[entity.m_index][componentKindIndex] != COMPONENT_DOES_NOT_EXIST) {
-                    //entity already has a component
-                    return;
-                }
-            //}
+            if (m_entitiesComponentsMask[entity.m_index][componentKindIndex] != COMPONENT_DOES_NOT_EXIST) {
+                //entity already has a component
+                return;
+            }
 
             DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(m_pools[componentKindIndex].get());
             std::size_t componentIndex = poolC->addComponent(std::forward<Args>(args) ...);
-            std::size_t entityIndex = entity.m_index;
-            m_entitiesComponentsMask[entityIndex][componentKindIndex] = componentIndex;
+            m_entitiesComponentsMask[entity.m_index][componentKindIndex] = componentIndex;
 
-            auto &line = std::get<typename std::vector<C *>>(m_vals);
             C *component = poolC->getComponent(componentIndex);
-            line.push_back(component);
+            //TODO: refactor out
+            auto &line = std::get<typename std::vector<C *>>(m_vals);
+            if (componentIndex < line.size()) {
+                line[componentIndex] = component;
+            } else {
+                line.push_back(component);
+            }
         }
 
         template<typename C>
@@ -209,6 +181,10 @@ namespace Giraffe {
                 //poolC->removeComponent(curComponentIndex);
 
                 m_pools[componentKindIndex]->removeComponent(curComponentIndex);
+
+                //TODO: refactor out
+                auto &line = std::get<typename std::vector<C *>>(m_vals);
+                line[curComponentIndex] = nullptr;
             }
         }
 
@@ -237,13 +213,9 @@ namespace Giraffe {
                 std::size_t componentIndex = m_entitiesComponentsMask[entityIndex][componentKindIndex];
 
                 if (componentIndex != COMPONENT_DOES_NOT_EXIST) {
-                    //DerivedComponentsPool<C> *poolC = static_cast< DerivedComponentsPool<C> * >(m_pools[componentKindIndex].get());
-                    //return poolC->getComponent(componentIndex);
 
-                    //
                     const auto &line = std::get<typename std::vector<C *>>(m_vals);
                     return line[componentIndex];
-                    //
                 }
 
                 throw std::runtime_error("component not registered");
@@ -433,6 +405,22 @@ namespace Giraffe {
         }
 
     private:
+
+        template<typename C>
+        void registerComponentKind() {
+
+            //has the component kind/family been registered yet?
+            if (DerivedComponentsPool<C>::index == COMPONENT_DOES_NOT_EXIST) {
+
+                if (m_componentsKindsCount == MAX_COMPONENTS_COUNT) {
+                    throw std::runtime_error(
+                            "Maximum number of components exceeded: " + std::to_string(MAX_COMPONENTS_COUNT));
+                }
+
+                DerivedComponentsPool<C>::index = m_componentsKindsCount++;
+                m_pools.emplace_back(std::make_unique<DerivedComponentsPool<C> >());
+            }
+        }
 
         std::vector<std::vector<std::size_t> > m_entitiesComponentsMask; //entity id -> components mask
         EntitiesContainerT m_entities;
