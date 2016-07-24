@@ -12,25 +12,21 @@
 #include <cassert>
 #include <type_traits> //std::aligned_storage
 #include <memory>
+#include <utility>      // std::pair
 
 #include "./Config.h"
 
 namespace Giraffe {
 
+    template <class C>
     class ComponentsPool {
     public:
-        virtual ~ComponentsPool() {}
-    };
-
-    template <class C>
-    class DerivedComponentsPool : public ComponentsPool {
-    public:
-        DerivedComponentsPool();
+        ComponentsPool();
         
-        ~DerivedComponentsPool();
+        ~ComponentsPool();
         
         template<typename ... Args>
-        std::size_t addComponent(Args &&... args);
+        std::pair<std::size_t, C*> addComponent(Args &&... args);
 
         void removeComponent(std::size_t index);
 
@@ -63,7 +59,7 @@ namespace Giraffe {
 
     template<class C>
     template<typename ... Args>
-    std::size_t DerivedComponentsPool<C>::addComponent(Args &&... args) {
+    std::pair<std::size_t, C*> ComponentsPool<C>::addComponent(Args &&... args) {
 
         if (!m_deletedComponentsIndexes.empty()) {
             //reuse old item
@@ -77,39 +73,44 @@ namespace Giraffe {
 
             m_links[linkIndex]->addComponent(itemIndexInLink, std::forward<Args>(args) ...);
 
-            return positionIndex;
+            C *component = reinterpret_cast<C *>(&m_links[linkIndex]->m_mem[itemIndexInLink]);
+
+            return std::make_pair(positionIndex, component);
         } else {
             if (m_curLink->m_used == Giraffe::POOL_COMPONENTS_PER_CHUNK) {
                 //the last link is filled; add new link
 
-                m_links.emplace_back(std::make_unique<DerivedComponentsPool<C>::Link>());
+                m_links.emplace_back(std::make_unique<ComponentsPool<C>::Link>());
 
                 m_curLink->m_next = m_links.back().get();
                 m_curLink = m_curLink->m_next;
             }
 
             m_curLink->addComponent(m_curLink->m_used, std::forward<Args>(args) ...);
+            C *component = reinterpret_cast<C *>(&m_curLink->m_mem[m_curLink->m_used]);
             ++m_curLink->m_used;
 
-            return (m_links.size() - 1)*Giraffe::POOL_COMPONENTS_PER_CHUNK + (m_curLink->m_used - 1);
+            //return (m_links.size() - 1)*Giraffe::POOL_COMPONENTS_PER_CHUNK + (m_curLink->m_used - 1);
+
+            std::size_t positionIndex = (m_links.size() - 1)*Giraffe::POOL_COMPONENTS_PER_CHUNK + (m_curLink->m_used - 1);
+            return std::make_pair(positionIndex, component);
         }
     }
 
     template<class C>
-    std::size_t DerivedComponentsPool<C>::index = COMPONENT_DOES_NOT_EXIST;
+    std::size_t ComponentsPool<C>::index = COMPONENT_DOES_NOT_EXIST;
 
     template<class C>
-    DerivedComponentsPool<C>::DerivedComponentsPool() :
-        ComponentsPool(), m_deletedComponentsIndexes(),
+    ComponentsPool<C>::ComponentsPool() : m_deletedComponentsIndexes(),
         m_links(), m_curLink(nullptr) {
 
-        m_links.emplace_back(std::make_unique<DerivedComponentsPool<C>::Link>());
+        m_links.emplace_back(std::make_unique<ComponentsPool<C>::Link>());
 
         m_curLink = m_links.back().get();
     }
 
     template<class C>
-    DerivedComponentsPool<C>::~DerivedComponentsPool() {
+    ComponentsPool<C>::~ComponentsPool() {
 
         if (!m_deletedComponentsIndexes.empty()) {
             std::size_t index = 0;
@@ -139,7 +140,7 @@ namespace Giraffe {
     }
 
     template<class C>
-    C *DerivedComponentsPool<C>::getComponent(std::size_t index) {
+    C *ComponentsPool<C>::getComponent(std::size_t index) {
 
         std::size_t linkIndex = index / Giraffe::POOL_COMPONENTS_PER_CHUNK;
         std::size_t itemIndexInLink = index % Giraffe::POOL_COMPONENTS_PER_CHUNK;
@@ -150,7 +151,7 @@ namespace Giraffe {
     }
 
     template<class C>
-    void DerivedComponentsPool<C>::removeComponent(std::size_t index) {
+    void ComponentsPool<C>::removeComponent(std::size_t index) {
 
         const C *component = getComponent(index);
         component->~C();
@@ -158,7 +159,7 @@ namespace Giraffe {
     }
 
     template<class C>
-    std::size_t DerivedComponentsPool<C>::getSize() const {
+    std::size_t ComponentsPool<C>::getSize() const {
 
         std::size_t result = 0;
         const auto *link = m_links[0].get();

@@ -25,8 +25,8 @@ TEST(StorageTest, AddNonRegisteredComponentToEntity) {
 
     EntityT e2 = storage.addEntity();
 
-    std::size_t componentFooKindIndex = Giraffe::DerivedComponentsPool<Foo>::index;
-    std::size_t componentBarKindIndex = Giraffe::DerivedComponentsPool<Bar>::index;
+    std::size_t componentFooKindIndex = Giraffe::ComponentsPool<Foo>::index;
+    std::size_t componentBarKindIndex = Giraffe::ComponentsPool<Bar>::index;
 
     std::size_t fooCount = 0;
     for (const auto &entity: storage.range<Foo>()) {

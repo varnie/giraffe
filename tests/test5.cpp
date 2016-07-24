@@ -22,8 +22,8 @@ TEST(StorageTest, RegisterDifferentComponentsInStorage) {
     //storage.registerComponentKind<Foo>();
     //storage.registerComponentKind<Bar>();
 
-    std::size_t componentFooKindIndex = Giraffe::DerivedComponentsPool<Foo>::index;
-    std::size_t componentBarKindIndex = Giraffe::DerivedComponentsPool<Bar>::index;
+    std::size_t componentFooKindIndex = Giraffe::ComponentsPool<Foo>::index;
+    std::size_t componentBarKindIndex = Giraffe::ComponentsPool<Bar>::index;
 
     EXPECT_EQ(componentFooKindIndex, 0);
     EXPECT_EQ(componentBarKindIndex, 1);

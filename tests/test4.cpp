@@ -19,7 +19,7 @@ TEST(StorageTest, RegisterTheSameComponentInStorage) {
     //    storage.registerComponentKind<Foo>();
     //}
 
-    std::size_t componentKindIndex = Giraffe::DerivedComponentsPool<Foo>::index;
+    std::size_t componentKindIndex = Giraffe::ComponentsPool<Foo>::index;
 
     EXPECT_EQ(componentKindIndex, 0);
 }
