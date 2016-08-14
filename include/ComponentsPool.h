@@ -90,8 +90,6 @@ namespace Giraffe {
             C *component = reinterpret_cast<C *>(&m_curLink->m_mem[m_curLink->m_used]);
             ++m_curLink->m_used;
 
-            //return (m_links.size() - 1)*Giraffe::POOL_COMPONENTS_PER_CHUNK + (m_curLink->m_used - 1);
-
             std::size_t positionIndex = (m_links.size() - 1)*Giraffe::POOL_COMPONENTS_PER_CHUNK + (m_curLink->m_used - 1);
             return std::make_pair(positionIndex, component);
         }
