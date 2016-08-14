@@ -25,9 +25,6 @@ TEST(StorageTest, SearchThreeRegisteredComponents) {
     using EntityT = Giraffe::Entity<StorageT>;
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
-    //storage.registerComponentKind<Bar>();
-    //storage.registerComponentKind<Fred>();
 
     int iMustBe = 0;
     int count = 20;

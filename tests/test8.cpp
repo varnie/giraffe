@@ -32,7 +32,6 @@ TEST(StorageTest, StorageRetrievals) {
     };
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
 
     EntityT e1 = storage.addEntity();
     e1.addComponent<Foo>();

@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include "../include/Giraffe.h"
 
-TEST(StorageTest, GetRegisteredComponentFromEntity) {
+TEST(StorageTest, GetAddedComponentToEntity) {
 
     struct Foo {
         Foo() { }
@@ -16,13 +16,12 @@ TEST(StorageTest, GetRegisteredComponentFromEntity) {
     using EntityT = Giraffe::Entity<StorageT>;
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
 
     EntityT e = storage.addEntity();
     e.addComponent<Foo>();
     bool ok;
     try {
-        auto *pComp = e.getComponent<Foo>();;
+        auto *pComp = e.getComponent<Foo>();
         ok = true;
     } catch (const std::runtime_error &exc) {
         ok = false;

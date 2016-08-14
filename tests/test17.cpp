@@ -15,7 +15,6 @@ TEST(StorageTest, CheckAddingTheSameComponentToEntity) {
     using EntityT = Giraffe::Entity<StorageT>;
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
 
     EntityT e = storage.addEntity();
     e.addComponent<Foo>();

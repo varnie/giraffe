@@ -34,7 +34,6 @@ TEST(StorageTest, EntityRemoveRecreateComponent) {
     };
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
 
     std::size_t poolSize1 = storage.getPoolSize<Foo>();
     EntityT e1 = storage.addEntity();

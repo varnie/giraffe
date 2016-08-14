@@ -6,13 +6,10 @@
 #include <stdexcept>
 #include "../include/Giraffe.h"
 
-TEST(StorageTest, retrieveNonRegisteredComponent_case_b) {
+TEST(StorageTest, retrieveNonAddedToEntityComponent) {
 
-    //component retrieval from storage must fail if one of the following cases is true:
-    //a) component kind not registered
-    //b) component wasn't added to entity
-
-    //this case checks the second case, b)
+    //component retrieval from storage must fail if
+    //component wasn't added to entity
 
     struct Foo {
         int m_i;
@@ -24,7 +21,6 @@ TEST(StorageTest, retrieveNonRegisteredComponent_case_b) {
     using EntityT = Giraffe::Entity<StorageT>;
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
 
     EntityT e = storage.addEntity();
     //e.addComponent<Foo>(); //intentionally commented out

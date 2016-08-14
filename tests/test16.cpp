@@ -38,7 +38,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation1) {
         using EntityT = Giraffe::Entity<StorageT>;
 
         StorageT storage;
-        //storage.registerComponentKind<Foo>();
         EntityT e = storage.addEntity();
     }
 
@@ -79,7 +78,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation2) {
         using EntityT = Giraffe::Entity<StorageT>;
 
         StorageT storage;
-        //storage.registerComponentKind<Foo>();
         EntityT e = storage.addEntity();
         e.addComponent<Foo>(result);
     }
@@ -122,7 +120,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation3) {
     using EntityT = Giraffe::Entity<StorageT>;
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
     EntityT e = storage.addEntity();
     e.addComponent<Foo>(result);
     //must explicitly call the dtor
@@ -165,7 +162,7 @@ TEST(StorageTest, ComponentsDestructorsInvocation4) {
         using EntityT = Giraffe::Entity<StorageT>;
 
         StorageT storage;
-        //storage.registerComponentKind<Foo>();
+
         EntityT e = storage.addEntity();
         e.addComponent<Foo>(result);
         e.removeComponent<Foo>();
@@ -208,7 +205,6 @@ TEST(StorageTest, ComponentsDestructorsInvocation5) {
     using EntityT = Giraffe::Entity<StorageT>;
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
 
     for (int i = 0; i < 5; ++i) {
         EntityT eX = storage.addEntity();

@@ -15,7 +15,6 @@ TEST(StorageTest, RemoveRestoreEntityHavingComponents) {
     using EntityT = Giraffe::Entity<StorageT>;
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
 
     EntityT e = storage.addEntity();
     e.addComponent<Foo>();
@@ -49,7 +48,6 @@ TEST(StorageTest, RemoveAndAndNewEntityWithComponents) {
     using EntityT = Giraffe::Entity<StorageT>;
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
 
     EntityT e1 = storage.addEntity();
     e1.addComponent<Foo>(42);

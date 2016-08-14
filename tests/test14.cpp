@@ -23,10 +23,6 @@ TEST(StorageTest, EntityHasComponents) {
     using EntityT = Giraffe::Entity<StorageT>;
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
-    //storage.registerComponentKind<Bar>();
-    //note, not registered component kind
-    //storage.registerComponentKind<Fred>();
 
     EntityT e1 = storage.addEntity();
     e1.addComponent<Foo>();
@@ -36,7 +32,7 @@ TEST(StorageTest, EntityHasComponents) {
     EXPECT_EQ(e1.hasComponent<Bar>(), true);
     EXPECT_EQ(e1.hasComponent<Fred>(), false);
 
-    //now add non registered component
+    //now add that absent component
     e1.addComponent<Fred>();
     EXPECT_EQ(e1.hasComponent<Fred>(), true);
 

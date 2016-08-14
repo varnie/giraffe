@@ -34,7 +34,6 @@ TEST(StorageTest, SystemSearchComponent) {
     };
 
     StorageT storage;
-    //storage.registerComponentKind<Foo>();
 
     EntityT e = storage.addEntity();
     e.addComponent<Foo>();
