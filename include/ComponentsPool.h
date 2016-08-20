@@ -48,8 +48,7 @@ namespace Giraffe {
 
             template<typename ... Args>
             void addComponent(std::size_t itemIndexInLink, Args &&... args) {
-                void *block = static_cast<void *>(&m_mem[itemIndexInLink]);
-                new(block) C(std::forward<Args>(args) ...);
+                new(&m_mem[itemIndexInLink]) C(std::forward<Args>(args) ...);
             }
         };
 
@@ -118,8 +117,7 @@ namespace Giraffe {
                     std::size_t itemIndexInLink = indexStart + i;
                     if (std::find(m_deletedComponentsIndexes.begin(), m_deletedComponentsIndexes.end(),
                                   itemIndexInLink) == m_deletedComponentsIndexes.end()) {
-                        void *block = static_cast<void *>(&link->m_mem[i]);
-                        C *component = reinterpret_cast<C *>(block);
+                        C *component = reinterpret_cast<C *>(&link->m_mem[i]);
                         component->~C();
                     }
                 }
@@ -129,8 +127,7 @@ namespace Giraffe {
         } else {
             for (const auto &link : m_links) {
                 for (std::size_t i = 0; i < link->m_used; ++i) {
-                    void *block = static_cast<void *>(&link->m_mem[i]);
-                    C *component = reinterpret_cast<C *>(block);
+                    C *component = reinterpret_cast<C *>(&link->m_mem[i]);
                     component->~C();
                 }
             }
